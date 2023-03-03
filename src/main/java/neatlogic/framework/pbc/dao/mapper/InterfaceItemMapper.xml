@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.pbc.dao.mapper.InterfaceItemMapper">
+
+    <select id="getNeedDeleteInterfaceItemIdByAuditId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select interfaceitem_id
+        from pbc_policy_audit_interfaceitem
+        where audit_id = #{value}
+          and action = 'delete'
+    </select>
+
+    <select id="getNeedReportInterfaceItemList"
+            resultType="neatlogic.framework.pbc.dto.InterfaceItemVo">
+        select id,
+               is_new      as isNew,
+               is_imported as isImported,
+               is_delete   as isDelete
+        from pbc_interface_item
+        where interface_id = #{interfaceId}
+          and corporation_id = #{corporationId}
+          and (is_new = 1
+            or is_delete = 1)
+    </select>
+
+    <resultMap id="interfaceItemMap" type="neatlogic.framework.pbc.dto.InterfaceVo">
+        <id property="id" column="id"/>
+        <result property="name" column="interfaceName"/>
+        <collection property="interfaceItemList" ofType="neatlogic.framework.pbc.dto.InterfaceItemVo">
+            <id property="id" column="interfaceItemId"/>
+            <result property="dataStr" column="interfaceItemData"/>
+            <result property="dataHash" column="interfaceItemDataHash"/>
+            <result property="action" column="interfaceItemAction"/>
+        </collection>
+    </resultMap>
+
+    <select id="getInterfaceItemByAuditId" parameterType="java.lang.Long"
+            resultMap="interfaceItemMap">
+        select c.id        as id,
+               c.name      AS interfaceName,
+               a.id        as interfaceItemId,
+               a.data      as interfaceItemData,
+               a.data_hash as interfaceItemDataHash,
+               b.action    as interfaceItemAction
+        from pbc_interface_item a
+                 join pbc_policy_audit_interfaceitem b on a.id = b.interfaceitem_id
+                 join pbc_interface c on a.interface_id = c.id
+        where b.audit_id = #{value}
+    </select>
+
+    <select id="getInterfaceItemNotInAudit" resultType="neatlogic.framework.pbc.dto.InterfaceItemVo">
+        select a.id, a.data_hash as dataHash
+        from pbc_interface_item a
+        where not exists(select 1
+                         from pbc_policy_audit_interfaceitem b
+                         where b.audit_id = #{auditId}
+                           and b.interfaceitem_id = a.id)
+    </select>
+
+    <select id="getInterfaceItemByPrimaryKeyAndCorporationId" resultType="neatlogic.framework.pbc.dto.InterfaceItemVo">
+        SELECT `id`,
+               `interface_id`   AS interfaceId,
+               `corporation_id` AS corporationId,
+               `data`           AS dataStr,
+               `data_hash`      AS dataHash,
+               `error`          AS errorStr,
+               `fcd`,
+               `fcu`,
+               `lcd`,
+               `lcu`
+        FROM `pbc_interface_item`
+        WHERE interface_id = #{interfaceId}
+          AND primary_key = #{primaryKey}
+          AND corporation_id = #{corporationId}
+    </select>
+
+    <select id="getInterfaceItemByInterfaceIdAndCiEntityIdAndCorporationId"
+            resultType="neatlogic.framework.pbc.dto.InterfaceItemVo">
+        SELECT `id`,
+               `interface_id`   AS interfaceId,
+               `cientity_id`    AS ciEntityId,
+               `corporation_id` AS corporationId,
+               `ci_id`          AS ciId,
+               `data`           AS dataStr,
+               `data_hash`      AS dataHash,
+               `error`          AS errorStr,
+               `fcd`,
+               `fcu`,
+               `lcd`,
+               `lcu`
+        FROM `pbc_interface_item`
+        WHERE interface_id = #{interfaceId}
+          AND cientity_id = #{ciEntityId}
+          AND corporation_id = #{corporationId}
+    </select>
+
+    <select id="getInterfaceItemById" parameterType="java.lang.Long"
+            resultType="neatlogic.framework.pbc.dto.InterfaceItemVo">
+        SELECT `id`,
+               `interface_id`   AS interfaceId,
+               `cientity_id`    AS ciEntityId,
+               `corporation_id` AS corporationId,
+               `ci_id`          AS ciId,
+               `data`           AS dataStr,
+               `data_hash`      AS dataHash,
+               `error`          AS errorStr,
+               `is_imported`    AS isImported,
+               `fcd`,
+               `fcu`,
+               `lcd`,
+               `lcu`
+        FROM `pbc_interface_item`
+        WHERE id = #{value}
+    </select>
+
+    <select id="getInterfaceItemByIdList" resultType="neatlogic.framework.pbc.dto.InterfaceItemVo">
+        SELECT
+        `id`,
+        `interface_id` AS interfaceId,
+        `cientity_id` AS ciEntityId,
+        `corporation_id` AS corporationId,
+        `ci_id` AS ciId,
+        `data` AS dataStr,
+        `data_hash` AS dataHash,
+        `error` AS errorStr,
+        `fcd`,
+        `fcu`,
+        `lcd`,
+        `lcu`
+        FROM `pbc_interface_item`
+        <where>
+            id in
+            <foreach collection="idList" item="item" open="(" close=")" separator=",">#{item}</foreach>
+        </where>
+    </select>
+
+    <select id="checkInterfaceHasAudit" parameterType="java.lang.String" resultType="int">
+        SELECT COUNT(1)
+        FROM (SELECT id
+              FROM `pbc_interface_item`
+              WHERE interface_id = #{value}
+              limit 1) t
+    </select>
+
+    <select id="checkCientityIfExist" parameterType="java.lang.Long" resultType="int">
+        SELECT COUNT(1)
+        FROM ecmdb_ci_entity
+        WHERE id = #{ciEntityId}
+    </select>
+
+    <sql id="searchInterfaceItemCondition">
+        <where>
+            <if test="corporationId != null">
+                AND a.corporation_id = #{corporationId}
+            </if>
+            <if test="interfaceUid != null">
+                AND b.uid = #{interfaceUid}
+            </if>
+            <if test="interfaceId != null and interfaceId != ''">
+                AND a.interface_id = #{interfaceId}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND a.`data` LIKE CONCAT('%',#{keyword},'%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="getItemCountByCorporationId" resultType="int">
+        SELECT count(1)
+        FROM pbc_interface_item
+        WHERE corporation_id = #{corporationId}
+        <if test="interfaceId != null and interfaceId != ''">
+            AND interface_id = #{interfaceId}
+        </if>
+    </select>
+
+    <select id="searchInterfaceItemCount" parameterType="neatlogic.framework.pbc.dto.InterfaceItemVo" resultType="int">
+        SELECT COUNT(1)
+        FROM `pbc_interface_item` a JOIN `pbc_interface` b ON a.interface_id = b.id
+        <include refid="searchInterfaceItemCondition"/>
+    </select>
+
+    <select id="getInterfaceItemCountByInterfaceId" parameterType="java.lang.String"
+            resultType="int">
+        SELECT count(1)
+        FROM (select id from `pbc_interface_item` where interface_id = #{value} limit 100) t
+    </select>
+
+    <select id="searchInterfaceItem" parameterType="neatlogic.framework.pbc.dto.InterfaceItemVo"
+            resultType="neatlogic.framework.pbc.dto.InterfaceItemVo">
+        SELECT
+        a.`id`,
+        a.`interface_id` AS interfaceId,
+        a.`cientity_id` AS ciEntityId,
+        a.`corporation_id` AS corporationId,
+        a.`ci_id` AS ciId,
+        a.`data` AS dataStr,
+        a.`data_hash` AS dataHash,
+        a.`error` AS errorStr,
+        a.`is_imported` AS isImported,
+        a.fcd,
+        a.fcu,
+        a.lcd,
+        a.lcu
+        FROM `pbc_interface_item` a JOIN `pbc_interface` b ON a.interface_id = b.id
+        <include refid="searchInterfaceItemCondition"/>
+        ORDER BY id DESC
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <update id="updateInterfaceItemIsDeleteByInterfaceIdAndCiId">
+        update pbc_interface_item
+        set is_delete = 1
+        where interface_id = #{interfaceId}
+          and ci_id = #{ciId}
+    </update>
+
+    <update id="updateInterfaceItemIsDeleteByInterfaceIdAndCustomViewId">
+        update pbc_interface_item
+        set is_delete = 1
+        where interface_id = #{interfaceId}
+          and customview_id = #{customViewId}
+    </update>
+
+    <update id="updateInterfaceItemDataHashByAuditId" parameterType="java.lang.Long">
+        update pbc_interface_item a
+        set data_hash   = MD5(data),
+            is_new      = 0,
+            is_imported = 1
+        where exists(select 1
+                     from pbc_policy_audit_interfaceitem b
+                     where b.interfaceitem_id = a.id
+                       and b.audit_id = #{value})
+    </update>
+
+
+    <update id="updateInterfaceItem" parameterType="neatlogic.framework.pbc.dto.InterfaceItemVo">
+        UPDATE
+            `pbc_interface_item`
+        SET `data`           = #{dataStr},
+            `lcd`            = now(3),
+            `lcu`            = #{lcu},
+            `error`          = #{errorStr,typeHandler=CompressHandler},
+            `is_new`         = #{isNew},
+            `is_delete`      = #{isDelete},
+            `corporation_id` = #{corporationId}
+        WHERE `id` = #{id}
+    </update>
+
+    <update id="updateInterfaceItemError" parameterType="neatlogic.framework.pbc.dto.InterfaceItemVo">
+        UPDATE
+            `pbc_interface_item`
+        SET `error` = #{errorStr,typeHandler=CompressHandler}
+        WHERE `id` = #{id}
+    </update>
+
+    <insert id="insertInterfaceItem" parameterType="neatlogic.framework.pbc.dto.InterfaceItemVo">
+        INSERT IGNORE INTO pbc_interface_item (`id`,
+                                               `interface_id`,
+                                               `cientity_id`,
+                                               `ci_id`,
+                                               `customview_id`,
+                                               `primary_key`,
+                                               `data`,
+                                               `fcd`,
+                                               `fcu`,
+                                               `lcd`,
+                                               `lcu`,
+                                               `error`,
+                                               `is_new`,
+                                               `is_imported`,
+                                               `is_delete`,
+                                               `corporation_id`)
+        VALUES (#{id},
+                #{interfaceId},
+                #{ciEntityId},
+                #{ciId},
+                #{customViewId},
+                #{primaryKey},
+                #{dataStr},
+                now(3),
+                #{fcu},
+                now(3),
+                #{lcu},
+                #{errorStr,typeHandler=CompressHandler},
+                #{isNew},
+                0, 0,
+                #{corporationId})
+    </insert>
+
+    <delete id="deleteInterfaceItemByInterfaceIdAndCiId">
+        DELETE
+        FROM pbc_interface_item
+        where interface_id = #{interfaceId}
+          and ci_id = #{ciId}
+          and is_delete = 1
+          and is_imported = 0
+    </delete>
+
+    <delete id="deleteInterfaceItemByInterfaceIdAndCustomViewId">
+        DELETE
+        FROM pbc_interface_item
+        where interface_id = #{interfaceId}
+          and customview_id = #{customViewId}
+          and is_delete = 1
+          and is_imported = 0
+    </delete>
+
+    <delete id="deleteInterfaceItemById" parameterType="java.lang.Long">
+        DELETE
+        FROM pbc_interface_item
+        WHERE id = #{value}
+    </delete>
+</mapper>

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.pbc.dao.mapper.InterfaceMapper">
+    <select id="getInterfaceCorporationByInterfaceIdAndCorporationId"
+            resultType="neatlogic.framework.pbc.dto.InterfaceCorporationVo">
+        SELECT interface_id AS interfaceId, corporation_id AS corporationId, rule AS ruleStr
+        FROM pbc_interface_corporation
+        WHERE interface_id = #{interfaceId}
+          AND corporation_id = #{corporationId}
+    </select>
+
+    <select id="getInterfaceCorporationByInterfaceId" parameterType="java.lang.String"
+            resultType="neatlogic.framework.pbc.dto.InterfaceCorporationVo">
+        SELECT a.id     AS corporationId,
+               a.name   AS corporationName,
+               #{value} AS interfaceId,
+               rule     AS ruleStr
+        FROM pbc_corporation a
+                 LEFT JOIN pbc_interface_corporation b ON a.id = b.corporation_id
+            AND b.interface_id = #{value}
+    </select>
+
+    <select id="getAllInterfaceList" resultType="neatlogic.framework.pbc.dto.InterfaceVo">
+        SELECT a.`uid`,
+               a.`id`,
+               a.`name`,
+               a.`ci_id`         AS ciId,
+               a.`customview_id` AS customViewId
+        FROM pbc_interface a
+        order by id
+    </select>
+
+
+    <select id="getInterfaceByPolicyId" parameterType="java.lang.Long"
+            resultType="neatlogic.framework.pbc.dto.InterfaceVo">
+        SELECT a.`uid`,
+               a.`id`,
+               a.`name`,
+               a.`ci_id`         AS ciId,
+               a.`customview_id` AS customViewId,
+               a.`priority`      AS priority,
+               c.name            AS ciName,
+               c.label           AS ciLabel,
+               d.name            AS customViewName,
+               a.status,
+               a.action_time     AS actionTime
+        FROM pbc_interface a
+                 join pbc_policy_interface b on a.id = b.interface_id
+                 LEFT JOIN cmdb_ci c ON a.ci_id = c.id
+                 LEFT JOIN cmdb_customview d ON a.customview_id = d.id
+        where b.policy_id = #{value}
+    </select>
+
+    <select id="getInterfaceById" parameterType="java.lang.String"
+            resultType="neatlogic.framework.pbc.dto.InterfaceVo">
+        SELECT a.`uid`,
+               a.`id`,
+               a.`name`,
+               a.`ci_id`         AS ciId,
+               a.`customview_id` AS customViewId,
+               a.priority,
+               b.name            AS customViewName,
+               c.name            AS ciName,
+               c.label           AS ciLabel,
+               a.status,
+               `error`
+        FROM pbc_interface a
+                 LEFT JOIN cmdb_customview b ON a.`customview_id` = b.id
+                 LEFT JOIN cmdb_ci c ON a.ci_id = c.id
+        WHERE a.id = #{value}
+    </select>
+
+    <select id="checkInterfaceById" parameterType="java.lang.String" resultType="int">
+        SELECT COUNT(1)
+        FROM pbc_interface
+        WHERE id = #{value}
+    </select>
+
+
+    <resultMap type="neatlogic.framework.pbc.dto.InterfaceVo" id="interfaceMap">
+        <id column="uid" property="uid"/>
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="ciId" property="ciId"/>
+        <result column="ciName" property="ciName"/>
+        <result column="ciLabel" property="ciLabel"/>
+        <result column="priority" property="priority"/>
+        <collection property="policyList" ofType="neatlogic.framework.pbc.dto.PolicyVo">
+            <result column="policyName" property="name"/>
+            <result column="cronExpression" property="cronExpression"/>
+        </collection>
+    </resultMap>
+
+    <sql id="searchInterfaceSql">
+        <where>
+            <if test="hasCi != null or hasCustomView != null">
+                AND (false
+                <if test="hasCi != null">
+                    <choose>
+                        <when test="hasCi == 1">
+                            OR a.ci_id is not null
+                        </when>
+                        <otherwise>OR a.ci_id is null</otherwise>
+                    </choose>
+                </if>
+                <if test="hasCustomView != null">
+                    <choose>
+                        <when test="hasCustomView == 1">
+                            OR a.customview_id is not null
+                        </when>
+                        <otherwise>OR a.customview_id is null</otherwise>
+                    </choose>
+                </if>
+                )
+            </if>
+            <if test="defaultValue != null and defaultValue.size() > 0">
+                AND a.id in
+                <foreach collection="defaultValue" item="item" open="(" close=")">#{item}</foreach>
+            </if>
+            <if test="keyword != null and keyword!=''">
+                AND (a.id LIKE CONCAT('%',#{keyword},'%') OR a.name LIKE CONCAT('%',#{keyword},'%'))
+            </if>
+        </where>
+    </sql>
+
+    <select id="searchInterface" parameterType="neatlogic.framework.pbc.dto.InterfaceVo"
+            resultMap="interfaceMap">
+        SELECT
+        a.`uid`,
+        a.`id`,
+        a.`name`,
+        a.`customview_id` AS customViewId,
+        b.`name` AS customViewName,
+        a.`ci_id` AS ciId,
+        c.`name` AS ciName,
+        c.`label` AS ciLabel,
+        a.priority,
+        e.cron_expression AS cronExpression,
+        e.name AS policyName
+        FROM `pbc_interface` a
+        LEFT JOIN `cmdb_customview` b ON a.customview_id = b.id
+        LEFT JOIN `cmdb_ci` c ON a.ci_id = c.id
+        LEFT JOIN `pbc_policy_interface` d ON a.id = d.interface_id
+        LEFT JOIN `pbc_policy` e ON d.policy_id = e.id
+        <include refid="searchInterfaceSql"></include>
+        ORDER BY a.uid DESC
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <select id="searchInterfaceCount" parameterType="neatlogic.framework.pbc.dto.InterfaceVo" resultType="int">
+        SELECT
+        COUNT(1)
+        FROM `pbc_interface` a
+        <include refid="searchInterfaceSql"></include>
+    </select>
+
+    <update id="updateInterfaceMapping" parameterType="neatlogic.framework.pbc.dto.InterfaceVo">
+        UPDATE pbc_interface
+        SET customview_id = #{customViewId},
+            ci_id         = #{ciId},
+            priority= #{priority}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateInterfaceStatus" parameterType="neatlogic.framework.pbc.dto.InterfaceVo">
+        UPDATE
+        pbc_interface
+        SET
+        <if test="status != null and status != ''">
+            action_time = NOW(),
+        </if>
+        `status` = #{status},
+        `error` = #{error}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateInterface" parameterType="neatlogic.framework.pbc.dto.InterfaceVo">
+        UPDATE
+            pbc_interface
+        SET `name` = #{name}
+        WHERE id = #{id}
+    </update>
+
+    <insert id="insertInterface" parameterType="neatlogic.framework.pbc.dto.InterfaceVo">
+        INSERT IGNORE INTO pbc_interface (`uid`, `id`, `name`, `customview_id`, `ci_id`, `priority`)
+        VALUES (#{uid}, #{id}, #{name}, #{customViewId}, #{ciId}, #{priority})
+    </insert>
+
+    <insert id="insertCorporationRule" parameterType="neatlogic.framework.pbc.dto.InterfaceCorporationVo">
+        INSERT INTO pbc_interface_corporation (`interface_id`, `rule`, `corporation_id`)
+        VALUES (#{interfaceId}, #{ruleStr}, #{corporationId})
+    </insert>
+
+    <delete id="deleteAllInterface">
+        delete a,b,c
+        from pbc_interface a
+                 left join pbc_property b on a.id = b.interface_id
+                 left join pbc_enum c on b.id = c.property_id
+    </delete>
+
+    <delete id="deleteCorporationRuleByInterfaceId" parameterType="java.lang.String">
+        delete
+        from pbc_interface_corporation
+        where interface_id = #{value}
+    </delete>
+
+    <delete id="deleteInterfaceById" parameterType="java.lang.String">
+        delete a,b,c
+        from pbc_interface a
+                 left join pbc_property b on a.id = b.interface_id
+                 left join pbc_enum c on b.id = c.property_id
+        where a.id = #{value}
+    </delete>
+</mapper>

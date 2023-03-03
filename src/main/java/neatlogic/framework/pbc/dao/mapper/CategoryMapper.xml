@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.pbc.dao.mapper.CategoryMapper">
+    <select id="getCategoryByInterfaceId" parameterType="java.lang.String"
+            resultType="neatlogic.framework.pbc.dto.CategoryVo">
+        SELECT a.id,
+               a.interface_id   as interfaceId,
+               a.interface_name as interfaceName,
+               a.id_1           as id1,
+               a.name_1         as name1,
+               a.id_2           as id2,
+               a.name_2         as name2,
+               a.id_3           as id3,
+               a.name_3         as name3,
+               a.id_4           as id4,
+               a.name_4         as name4,
+               a.is_match       as isMatch
+        FROM pbc_category a
+        WHERE a.interface_id = #{value}
+    </select>
+
+    <select id="getCategoryById" parameterType="java.lang.String"
+            resultType="neatlogic.framework.pbc.dto.CategoryVo">
+        SELECT a.id,
+               a.interface_id   as interfaceId,
+               a.interface_name as interfaceName,
+               a.id_1           as id1,
+               a.name_1         as name1,
+               a.id_2           as id2,
+               a.name_2         as name2,
+               a.id_3           as id3,
+               a.name_3         as name3,
+               a.id_4           as id4,
+               a.name_4         as name4,
+               a.is_match       as isMatch
+        FROM pbc_category a
+        WHERE a.id = #{value}
+    </select>
+
+    <select id="searchCategoryCount" parameterType="neatlogic.framework.pbc.dto.CategoryVo" resultType="int">
+        SELECT
+        count(1)
+        FROM
+        pbc_category a
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (a.id LIKE concat('%',#{keyword},'%') OR a.interface_id LIKE concat('%',#{keyword},'%') OR
+                a.interface_name LIKE concat('%',#{keyword},'%'))
+            </if>
+        </where>
+    </select>
+
+    <select id="searchCategory" parameterType="neatlogic.framework.pbc.dto.CategoryVo"
+            resultType="neatlogic.framework.pbc.dto.CategoryVo">
+        SELECT
+        a.id,
+        a.interface_id as interfaceId,
+        a.interface_name as interfaceName,
+        a.id_1 as id1,
+        a.name_1 as name1,
+        a.id_2 as id2,
+        a.name_2 as name2,
+        a.id_3 as id3,
+        a.name_3 as name3,
+        a.id_4 as id4,
+        a.name_4 as name4,
+        a.is_match as isMatch
+        FROM
+        pbc_category a
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (a.id LIKE concat('%',#{keyword},'%') OR a.interface_id LIKE concat('%',#{keyword},'%') OR
+                a.interface_name LIKE concat('%',#{keyword},'%'))
+            </if>
+        </where>
+        order by a.id
+        limit #{startNum},#{pageSize}
+    </select>
+
+
+    <insert id="replaceCategory" parameterType="neatlogic.framework.pbc.dto.CategoryVo">
+        replace into pbc_category
+        (id,
+         interface_name,
+         interface_id,
+         id_1,
+         name_1,
+         id_2,
+         name_2,
+         id_3,
+         name_3,
+         id_4,
+         name_4,
+         is_match)
+        values (#{id},
+                #{interfaceName},
+                #{interfaceId},
+                #{id1},
+                #{name1},
+                #{id2},
+                #{name2},
+                #{id3},
+                #{name3},
+                #{id4},
+                #{name4},
+                #{isMatch})
+    </insert>
+
+    <update id="updateCategory" parameterType="neatlogic.framework.pbc.dto.CategoryVo">
+        update pbc_category
+        set `name`          = #{name},
+            `parent_id`     = #{parentId},
+            level_category  = #{levelCategory},
+            `full_category` = #{fullCategory}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCategoryById" parameterType="java.lang.Long">
+        delete
+        from pbc_category
+        where id = #{value}
+    </delete>
+</mapper>

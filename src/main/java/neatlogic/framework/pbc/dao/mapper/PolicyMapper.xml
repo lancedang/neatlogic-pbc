@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="neatlogic.framework.pbc.dao.mapper.PolicyMapper">
+
+    <select id="getPolicyAuditInterfaceItemInfoByAuditId" parameterType="java.lang.Long"
+            resultType="neatlogic.framework.pbc.dto.PolicyAuditInterfaceItemStatistVo">
+        select count(1) as count, action
+        from pbc_policy_audit_interfaceitem a
+                 join pbc_interface_item b on a.interfaceitem_id = b.id
+        where audit_id = #{value}
+        group by action
+    </select>
+
+    <select id="getPolicyPhaseByAuditId" parameterType="java.lang.Long"
+            resultType="neatlogic.framework.pbc.dto.PolicyPhaseVo">
+        select id,
+               audit_id   as auditId,
+               phase,
+               status,
+               start_time as startTime,
+               end_time   as endTime,
+               result,
+               error,
+               sort,
+               exec_count AS execCount
+        from pbc_policy_phase
+        where audit_id = #{value}
+        order by sort
+    </select>
+
+    <sql id="searchPolicyAuditCondition">
+        <where>
+            <if test="policyId != null">
+                AND a.policy_id = #{policyId}
+            </if>
+            <if test="idList != null and idList.size() > 0">
+                AND a.id in
+                <foreach collection="idList" open="(" close=")" separator="," item="item">#{item}</foreach>
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <choose>
+                <when test="hasError == true">
+                    and a.error is not null
+                </when>
+                <when test="hasError == false">
+                    and a.error is null
+                </when>
+            </choose>
+            <if test="startTimeRange != null">
+                <if test="startTimeRange.size() > 0">
+                    AND a.start_time &gt;= STR_TO_DATE(#{startTimeRange[0]},'%Y-%m-%d')
+                </if>
+                <if test="startTimeRange.size() > 1">
+                    AND a.start_time &lt;= STR_TO_DATE(#{startTimeRange[1]},'%Y-%m-%d')
+                </if>
+            </if>
+            <if test="endTimeRange != null">
+                <if test="endTimeRange.size() > 0">
+                    AND a.end_time &gt;= STR_TO_DATE(#{endTimeRange[0]},'%Y-%m-%d')
+                </if>
+                <if test="endTimeRange.size() > 1">
+                    AND a.end_time &lt;= STR_TO_DATE(#{endTimeRange[1]},'%Y-%m-%d')
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <select id="searchPolicyAudit" parameterType="neatlogic.framework.pbc.dto.PolicyAuditVo"
+            resultType="neatlogic.framework.pbc.dto.PolicyAuditVo">
+        select id,
+        policy_id as policyId,
+        start_time as startTime,
+        end_time as endTime,
+        status,
+        (UNIX_TIMESTAMP(IFNULL(end_time, NOW(3))) - UNIX_TIMESTAMP(start_time))*1000 AS timeCost,
+        user_id as userId,
+        server_id as serverId,
+        error,
+        (select count(1) from pbc_policy_audit_interfaceitem b where b.audit_id = a.id) as dataCount,
+        input_from as inputFrom
+        from pbc_policy_audit a
+        <include refid="searchPolicyAuditCondition"></include>
+        order by id desc
+        limit #{startNum}, #{pageSize}
+    </select>
+
+    <select id="searchPolicyAuditCount" parameterType="neatlogic.framework.pbc.dto.PolicyAuditVo" resultType="int">
+        select count(1)
+        from pbc_policy_audit a
+        <include refid="searchPolicyAuditCondition"></include>
+    </select>
+
+    <select id="getPolicyPhaseByAuditIdAndPhase" resultType="neatlogic.framework.pbc.dto.PolicyPhaseVo">
+        select id,
+               audit_id   as auditId,
+               phase,
+               status,
+               start_time as startTime,
+               end_time   as endTime,
+               result,
+               error,
+               sort
+        from pbc_policy_phase
+        where audit_id = #{auditId}
+          and phase = #{phase}
+    </select>
+
+    <resultMap id="policyAuditResultMap" type="neatlogic.framework.pbc.dto.PolicyAuditVo">
+        <id property="id" column="id"/>
+        <result property="policyId" column="policyId"/>
+        <result property="startTime" column="startTime"/>
+        <result property="endTime" column="endTime"/>
+        <result property="status" column="status"/>
+        <collection property="phaseList" ofType="neatlogic.framework.pbc.dto.PolicyPhaseVo">
+            <id property="id" column="phaseId"/>
+            <result property="startTime" column="phaseStartTime"/>
+            <result property="endTime" column="phaseEndTime"/>
+            <result property="status" column="phaseStatus"/>
+            <result property="phase" column="phase"/>
+            <result property="error" column="error"/>
+            <result property="auditId" column="auditId"/>
+            <result property="result" column="result"/>
+            <result property="startTime" column="phaseStartTime"/>
+            <result property="endTime" column="phaseEndTime"/>
+            <result property="timeCost" column="timeCost"/>
+            <result property="execCount" column="execCount"/>
+        </collection>
+    </resultMap>
+
+    <select id="getPolicyAuditById" parameterType="java.lang.Long" resultMap="policyAuditResultMap">
+        SELECT a.id,
+               a.policy_id                                                                       as policyId,
+               a.start_time                                                                      AS startTime,
+               a.end_time                                                                        AS endTime,
+               a.status                                                                          AS status,
+               b.id                                                                              as phaseId,
+               b.start_time                                                                      AS phaseStartTime,
+               b.end_time                                                                        AS phaseEndTime,
+               b.`status`                                                                        AS phaseStatus,
+               b.phase                                                                           AS phase,
+               b.error                                                                           AS error,
+               b.result                                                                          AS result,
+               b.exec_count                                                                      AS execCount,
+               b.audit_id                                                                        AS auditId,
+               (UNIX_TIMESTAMP(IFNULL(b.end_time, NOW())) - UNIX_TIMESTAMP(b.start_time)) * 1000 AS timeCost
+        FROM pbc_policy_audit a
+                 LEFT JOIN pbc_policy_phase b ON a.id = b.audit_id
+        WHERE a.id = #{value}
+        order by b.sort
+    </select>
+
+    <select id="getRunningPolicyAuditByServerId" parameterType="java.lang.Integer" resultMap="policyAuditResultMap">
+        SELECT a.id,
+               a.policy_id  AS policyId,
+               a.start_time AS startTime,
+               a.end_time   AS endTime,
+               a.status     AS status,
+               b.id         as phaseId,
+               b.start_time AS phaseStartTime,
+               b.end_time   AS phaseEndTime,
+               b.`status`   AS phaseStatus
+        FROM pbc_policy_audit a
+                 LEFT JOIN pbc_policy_phase b ON a.id = b.audit_id
+        WHERE a.server_id = #{value}
+          and a.status = 'running'
+        order by b.sort
+    </select>
+
+    <select id="getAllCronPolicy" resultType="neatlogic.framework.pbc.dto.PolicyVo">
+        select a.id              as id,
+               a.name            as name,
+               a.description,
+               a.is_active       AS isActive,
+               a.cron_expression AS cronExpression,
+               a.phase
+        FROM pbc_policy a
+        where a.cron_expression is not null
+          and a.cron_expression != ''
+    </select>
+
+    <resultMap id="policyResultMap" type="neatlogic.framework.pbc.dto.PolicyVo">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="isActive" column="isActive"/>
+        <result property="cronExpression" column="cronExpression"/>
+        <result property="phase" column="phase"/>
+        <result property="configStr" column="configStr"/>
+        <result property="corporationId" column="corporationId"/>
+        <collection property="interfaceList" ofType="java.lang.String">
+            <id column="interfaceId"/>
+        </collection>
+    </resultMap>
+
+    <select id="getPolicyById" parameterType="java.lang.Long" resultMap="policyResultMap">
+        select a.id              as id,
+               a.name            as name,
+               a.description,
+               a.is_active       AS isActive,
+               a.cron_expression AS cronExpression,
+               b.interface_id    AS interfaceId,
+               a.phase,
+               a.corporation_id  AS corporationId,
+               a.config          AS configStr
+        FROM pbc_policy a
+                 LEFT JOIN pbc_policy_interface b ON a.id = b.policy_id
+        WHERE a.id = #{value}
+    </select>
+
+    <sql id="searchPolicySql">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (a.name like concat('%',#{keyword},'%') or a.description like concat('%',#{keyword},'%'))
+            </if>
+            <if test="isActive != null">
+                and a.is_active = #{isActive}
+            </if>
+            <if test="corporationId != null">
+                and a.corporation_id = #{corporationId}
+            </if>
+        </where>
+    </sql>
+
+    <select id="searchPolicy" parameterType="neatlogic.framework.pbc.dto.PolicyVo"
+            resultType="neatlogic.framework.pbc.dto.PolicyVo">
+        SELECT
+        a.id,
+        a.name,
+        a.description,
+        a.is_active AS isActive,
+        a.cron_expression AS cronExpression,
+        ( SELECT count( 1 ) FROM pbc_policy_interface b where b.policy_id = a.id ) AS interfaceCount,
+        (select count(1) from pbc_policy_audit c where c.policy_id = a.id) AS execCount,
+        last_exec_date as lastExecDate,
+        phase,
+        a.config as configStr,
+        a.corporation_id as corporationId,
+        (select name from pbc_corporation x where x.id = a.corporation_id) AS corporationName
+        FROM
+        pbc_policy a
+        <include refid="searchPolicySql"></include>
+        limit #{startNum}, #{pageSize}
+    </select>
+
+    <select id="searchPolicyCount" parameterType="neatlogic.framework.pbc.dto.PolicyVo" resultType="int">
+        select count(1)
+        from pbc_policy a
+        <include refid="searchPolicySql"></include>
+    </select>
+
+    <update id="updatePolicyLastExecDate" parameterType="java.lang.Long">
+        update pbc_policy
+        set last_exec_date = now(3)
+        where id = #{value}
+    </update>
+
+    <update id="updatePolicy" parameterType="neatlogic.framework.pbc.dto.PolicyVo">
+        update pbc_policy
+        set name            = #{name},
+            description     = #{description},
+            is_active       = #{isActive},
+            cron_expression = #{cronExpression},
+            phase           = #{phase},
+            config          = #{configStr},
+            corporation_id  = #{corporationId}
+        where id = #{id}
+    </update>
+
+    <update id="updatePolicyAudit" parameterType="neatlogic.framework.pbc.dto.PolicyAuditVo">
+        update pbc_policy_audit
+        set
+        <choose>
+            <when test="status == 'success' or status == 'failed'">
+                end_time = now(3),
+            </when>
+            <when test="status == 'running'">
+                start_time = now(3),
+                end_time = null,
+            </when>
+        </choose>
+        status = #{status},
+        error = #{error,typeHandler=CompressHandler}
+        where id = #{id}
+    </update>
+
+    <update id="updatePolicyPhase" parameterType="neatlogic.framework.pbc.dto.PolicyPhaseVo">
+        update pbc_policy_phase
+        set
+        <choose>
+            <when test="status == 'success' or status == 'failed'">
+                end_time = now(3),
+                error = #{error,typeHandler=CompressHandler},
+                result = #{result,typeHandler=CompressHandler},
+            </when>
+            <when test="status == 'running'">
+                start_time = now(3),
+            </when>
+            <when test="status == 'pending'">
+                start_time = null,
+                end_time = null,
+                result = null,
+                error = null,
+            </when>
+        </choose>
+        exec_count = #{execCount},
+        status = #{status}
+        where id = #{id}
+    </update>
+
+    <insert id="insertAuditInterfaceItem">
+        insert into pbc_policy_audit_interfaceitem (audit_id, interfaceitem_id, action)
+        values (#{auditId}, #{interfaceItemId}, #{action})
+    </insert>
+
+    <insert id="insertPolicyPhase" parameterType="neatlogic.framework.pbc.dto.PolicyPhaseVo">
+        insert into pbc_policy_phase (id, audit_id, phase, status, sort)
+        values (#{id}, #{auditId}, #{phase}, #{status}, #{sort})
+    </insert>
+
+    <insert id="insertPolicyAudit" parameterType="neatlogic.framework.pbc.dto.PolicyAuditVo">
+        insert into pbc_policy_audit (id, policy_id, status, user_id, server_id, input_from)
+        values (#{id}, #{policyId}, #{status}, #{userId}, #{serverId}, #{inputFrom})
+    </insert>
+
+    <insert id="insertPolicy" parameterType="neatlogic.framework.pbc.dto.PolicyVo">
+        insert into pbc_policy
+        (id, name, description, is_active, phase, cron_expression, config, corporation_id)
+        values (#{id}, #{name}, #{description}, #{isActive}, #{phase}, #{cronExpression}, #{configStr},
+                #{corporationId})
+    </insert>
+
+    <insert id="insertPolicyInterface" parameterType="neatlogic.framework.pbc.dto.PolicyInterfaceVo">
+        insert into pbc_policy_interface (policy_id, interface_id)
+        values (#{policyId}, #{interfaceId})
+    </insert>
+
+    <delete id="deletePolicyInterfaceByPolicyId" parameterType="java.lang.Long">
+        delete
+        from pbc_policy_interface
+        where policy_id = #{value}
+    </delete>
+
+    <delete id="deletePolicy" parameterType="java.lang.Long">
+        delete
+            a,b,c,d,e
+        from pbc_policy a
+                 left join pbc_policy_interface b on a.id = b.policy_id
+                 left join pbc_policy_audit c on a.id = c.policy_id
+                 left join pbc_policy_phase d on c.id = d.audit_id
+                 left join pbc_policy_audit_interfaceitem e on c.id = e.audit_id
+        where a.id =
+              #{value}
+    </delete>
+
+    <delete id="deletePolicyAudit" parameterType="java.lang.Long">
+        delete
+            a,b,c
+        from pbc_policy_audit a
+                 left join pbc_policy_phase b
+                           on a.id = b.audit_id
+                 left join pbc_policy_audit_interfaceitem c on a.id = c.audit_id
+        where a.id = #{value}
+    </delete>
+
+    <delete id="deleteAuditByDayBefore" parameterType="int">
+        delete
+            a,b,c
+        from pbc_policy_audit a
+                 left join pbc_policy_phase b
+                           on a.id = b.audit_id
+                 left join pbc_policy_audit_interfaceitem c on a.id = c.audit_id
+        where a.end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
+    </delete>
+
+    <delete id="deletePolicyAuditInterfaceItemByAuditId" parameterType="java.lang.Long">
+        delete
+        from pbc_policy_audit_interfaceitem
+        where audit_id = #{value}
+    </delete>
+</mapper>

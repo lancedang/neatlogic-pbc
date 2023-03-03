@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="neatlogic.framework.pbc.dao.mapper.CorporationMapper">
+    <cache type="neatlogic.framework.dao.cache.NeatLogicCache" flushInterval="30000" size="100"></cache>
+
+    <select id="searchCorporation" resultType="neatlogic.framework.pbc.dto.CorporationVo">
+        select id, name, config AS configStr
+        from pbc_corporation
+    </select>
+
+    <select id="getCorporationById" parameterType="java.lang.Long"
+            resultType="neatlogic.framework.pbc.dto.CorporationVo">
+        SELECT id, name, config AS configStr
+        FROM pbc_corporation
+        where id = #{value}
+    </select>
+
+    <insert id="saveCorporation" parameterType="neatlogic.framework.pbc.dto.CorporationVo">
+        REPLACE
+            INTO `pbc_corporation` (id, name, config)
+        VALUES (#{id}, #{name}, #{configStr,typeHandler=CompressHandler})
+    </insert>
+
+    <delete id="deleteCorporation" parameterType="java.lang.Long">
+        DELETE
+        FROM `pbc_corporation`
+        WHERE id = #{value}
+    </delete>
+</mapper>
