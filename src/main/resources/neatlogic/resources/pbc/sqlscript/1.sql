@@ -1,7 +1,7 @@
 -- ----------------------------
 -- Table structure for pbc_branch_item
 -- ----------------------------
-CREATE TABLE `pbc_branch_item` (
+CREATE TABLE IF NOT EXISTS `pbc_branch_item` (
   `branch_id` bigint NOT NULL COMMENT '批次ID',
   `item_id` bigint NOT NULL COMMENT '数据ID',
   PRIMARY KEY (`branch_id`,`item_id`) USING BTREE
@@ -10,7 +10,7 @@ CREATE TABLE `pbc_branch_item` (
 -- ----------------------------
 -- Table structure for pbc_category
 -- ----------------------------
-CREATE TABLE `pbc_category` (
+CREATE TABLE IF NOT EXISTS `pbc_category` (
   `id` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '一级分类标识符（两位）、二级分类标识符（两位）、三级分类标识符（三位）和四级分类标识符（三位）',
   `interface_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '数据元名称',
   `interface_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '数据元传输标识',
@@ -30,7 +30,7 @@ CREATE TABLE `pbc_category` (
 -- ----------------------------
 -- Table structure for pbc_corporation
 -- ----------------------------
-CREATE TABLE `pbc_corporation` (
+CREATE TABLE IF NOT EXISTS `pbc_corporation` (
   `id` bigint NOT NULL COMMENT '主键',
   `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '配置',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '名称',
@@ -40,7 +40,7 @@ CREATE TABLE `pbc_corporation` (
 -- ----------------------------
 -- Table structure for pbc_enum
 -- ----------------------------
-CREATE TABLE `pbc_enum` (
+CREATE TABLE IF NOT EXISTS `pbc_enum` (
   `property_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '人行属性ID',
   `text` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '枚举属性显示',
   `value` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '枚举属性值',
@@ -50,7 +50,7 @@ CREATE TABLE `pbc_enum` (
 -- ----------------------------
 -- Table structure for pbc_interface
 -- ----------------------------
-CREATE TABLE `pbc_interface` (
+CREATE TABLE IF NOT EXISTS `pbc_interface` (
   `uid` int NOT NULL COMMENT '数字id',
   `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '人行提供的id',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
@@ -68,7 +68,7 @@ CREATE TABLE `pbc_interface` (
 -- ----------------------------
 -- Table structure for pbc_interface_corporation
 -- ----------------------------
-CREATE TABLE `pbc_interface_corporation` (
+CREATE TABLE IF NOT EXISTS `pbc_interface_corporation` (
   `interface_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接口id',
   `rule` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '规则',
   `corporation_id` bigint NOT NULL COMMENT '机构id',
@@ -78,7 +78,7 @@ CREATE TABLE `pbc_interface_corporation` (
 -- ----------------------------
 -- Table structure for pbc_interface_item
 -- ----------------------------
-CREATE TABLE `pbc_interface_item` (
+CREATE TABLE IF NOT EXISTS `pbc_interface_item` (
   `id` bigint NOT NULL COMMENT '雪花id',
   `interface_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '接口id',
   `cientity_id` bigint DEFAULT NULL COMMENT '配置项id',
@@ -104,7 +104,7 @@ CREATE TABLE `pbc_interface_item` (
 -- ----------------------------
 -- Table structure for pbc_policy
 -- ----------------------------
-CREATE TABLE `pbc_policy` (
+CREATE TABLE IF NOT EXISTS `pbc_policy` (
   `id` bigint NOT NULL COMMENT '主键',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '说明',
@@ -121,7 +121,7 @@ CREATE TABLE `pbc_policy` (
 -- ----------------------------
 -- Table structure for pbc_policy_audit
 -- ----------------------------
-CREATE TABLE `pbc_policy_audit` (
+CREATE TABLE IF NOT EXISTS `pbc_policy_audit` (
   `id` bigint NOT NULL COMMENT '主键',
   `policy_id` bigint DEFAULT NULL COMMENT '策略id',
   `start_time` timestamp(3) NULL DEFAULT NULL COMMENT '开始时间',
@@ -139,7 +139,7 @@ CREATE TABLE `pbc_policy_audit` (
 -- ----------------------------
 -- Table structure for pbc_policy_audit_interfaceitem
 -- ----------------------------
-CREATE TABLE `pbc_policy_audit_interfaceitem` (
+CREATE TABLE IF NOT EXISTS `pbc_policy_audit_interfaceitem` (
   `audit_id` bigint NOT NULL COMMENT '策略执行记录ID',
   `interfaceitem_id` bigint NOT NULL COMMENT '模型数据ID',
   `action` enum('new','update','delete') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '动作',
@@ -149,7 +149,7 @@ CREATE TABLE `pbc_policy_audit_interfaceitem` (
 -- ----------------------------
 -- Table structure for pbc_policy_interface
 -- ----------------------------
-CREATE TABLE `pbc_policy_interface` (
+CREATE TABLE IF NOT EXISTS `pbc_policy_interface` (
   `policy_id` bigint NOT NULL COMMENT '策略id',
   `interface_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接口id',
   PRIMARY KEY (`policy_id`,`interface_id`) USING BTREE
@@ -158,7 +158,7 @@ CREATE TABLE `pbc_policy_interface` (
 -- ----------------------------
 -- Table structure for pbc_policy_phase
 -- ----------------------------
-CREATE TABLE `pbc_policy_phase` (
+CREATE TABLE IF NOT EXISTS `pbc_policy_phase` (
   `id` bigint NOT NULL COMMENT '自增id',
   `audit_id` bigint DEFAULT NULL COMMENT '记录ID',
   `phase` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '阶段',
@@ -176,7 +176,7 @@ CREATE TABLE `pbc_policy_phase` (
 -- ----------------------------
 -- Table structure for pbc_property
 -- ----------------------------
-CREATE TABLE `pbc_property` (
+CREATE TABLE IF NOT EXISTS `pbc_property` (
   `uid` int NOT NULL COMMENT 'global id',
   `id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '属性标识',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '属性名称',
@@ -199,7 +199,7 @@ CREATE TABLE `pbc_property` (
 -- ----------------------------
 -- Table structure for pbc_property_mapping
 -- ----------------------------
-CREATE TABLE `pbc_property_mapping` (
+CREATE TABLE IF NOT EXISTS `pbc_property_mapping` (
   `property_uid` bigint NOT NULL COMMENT 'pbc_property表的主键',
   `interface_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '模型ID',
   `complex_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '复合属性ID',
@@ -214,7 +214,7 @@ CREATE TABLE `pbc_property_mapping` (
 -- ----------------------------
 -- Table structure for pbc_property_rel
 -- ----------------------------
-CREATE TABLE `pbc_property_rel` (
+CREATE TABLE IF NOT EXISTS `pbc_property_rel` (
   `id` bigint NOT NULL COMMENT '自增id',
   `from_property_uid` bigint DEFAULT NULL COMMENT '上游属性uid',
   `to_interface_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '关联接口id',
