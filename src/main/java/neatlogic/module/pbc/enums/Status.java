@@ -20,8 +20,10 @@ package neatlogic.module.pbc.enums;
  * 策略执行状态
  */
 public enum Status {
-    PENDING("pending", "已就绪"), RUNNING("running", "进行中"), SUCCESS("success", "已成功"),
-    FAILED("failed", "已失败");
+    PENDING("pending", "enum.pbc.status.pending"),
+    RUNNING("running", "enum.pbc.status.running"),
+    SUCCESS("success", "enum.pbc.status.success.1"),
+    FAILED("failed", "enum.pbc.status.failed.1");
 
     private final String value;
     private final String text;

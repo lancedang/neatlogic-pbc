@@ -19,6 +19,7 @@ package neatlogic.framework.pbc.dto;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.restful.annotation.EntityField;
+import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -28,7 +29,9 @@ import java.util.Objects;
 
 public class InterfaceVo extends BasePageVo {
     public enum Status {
-        VALIDATING("validating", "校验中"), REPORTING("reporting", "上报中"), MAPPING("mapping", "同步中");
+        VALIDATING("validating", "enum.pbc.status.validating"),
+        REPORTING("reporting", "enum.pbc.status.reporting"),
+        MAPPING("mapping", "enum.pbc.status.mapping");
         private final String type;
         private final String text;
 
@@ -42,7 +45,7 @@ public class InterfaceVo extends BasePageVo {
         }
 
         public String getText() {
-            return text;
+            return I18nUtils.getMessage(text);
         }
 
         public static String getText(String name) {
@@ -56,7 +59,7 @@ public class InterfaceVo extends BasePageVo {
     }
 
     public enum Priority {
-        VIEW("view", "视图"), CI("ci", "模型");
+        VIEW("view", "enum.pbc.priority.view"), CI("ci", "enum.pbc.priority.ci");
         private final String type;
         private final String text;
 
@@ -70,7 +73,7 @@ public class InterfaceVo extends BasePageVo {
         }
 
         public String getText() {
-            return text;
+            return I18nUtils.getMessage(text);
         }
 
         public static String getText(String name) {

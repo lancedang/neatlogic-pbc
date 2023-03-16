@@ -16,8 +16,12 @@
 
 package neatlogic.module.pbc.enums;
 
+import neatlogic.framework.util.I18nUtils;
+
 public enum Action {
-    NEW("new", "新增"), UPDATE("update", "更新"), DELETE("delete", "删除");
+    NEW("new", "enum.pbc.action.new"),
+    UPDATE("update", "enum.pbc.action.update"),
+    DELETE("delete", "enum.pbc.action.delete");
 
     private final String value;
     private final String text;
@@ -32,7 +36,7 @@ public enum Action {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text);
     }
 
     public static String getValue(String _status) {
