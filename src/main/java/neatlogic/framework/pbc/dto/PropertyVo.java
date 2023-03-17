@@ -21,6 +21,7 @@ import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,14 +34,14 @@ import java.util.regex.Pattern;
 
 public class PropertyVo extends BasePageVo {
     public enum InputType {
-        TEXT("text", "文本框"),
-        DATE("date", "日期"),
-        DATETIME("datetime", "时间"),
-        SELECT("select", "下拉框"),
-        UUID("uuid", "全局唯一标识"),
-        BOOLEAN("boolean", "布尔选择"),
-        RELSELECT("relselect", "关联关系"),
-        CATEGORY("category", "设施分类编码");
+        TEXT("text", "enum.pbc.inputtype.text"),
+        DATE("date", "enum.pbc.inputtype.date"),
+        DATETIME("datetime", "enum.pbc.inputtype.datetime"),
+        SELECT("select", "enum.pbc.inputtype.select"),
+        UUID("uuid", "enum.pbc.inputtype.uuid"),
+        BOOLEAN("boolean", "enum.pbc.inputtype.boolean"),
+        RELSELECT("relselect", "enum.pbc.inputtype.relselect"),
+        CATEGORY("category", "enum.pbc.inputtype.category");
         private final String type;
         private final String text;
 
@@ -54,7 +55,7 @@ public class PropertyVo extends BasePageVo {
         }
 
         public String getText() {
-            return text;
+            return I18nUtils.getMessage(text);
         }
 
         public static String getText(String name) {
