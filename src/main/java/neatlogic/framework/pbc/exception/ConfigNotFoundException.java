@@ -20,7 +20,7 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class ConfigNotFoundException extends ApiRuntimeException {
     public ConfigNotFoundException() {
-        super("请先设置机构配置再上报");
+        super("exception.pbc.confignotfoundexception");
     }
 
 }

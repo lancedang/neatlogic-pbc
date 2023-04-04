@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class CreateFileException extends ApiRuntimeException {
     public CreateFileException(String message) {
-        super("创建上报文件失败，异常信息：" + message);
+        super("exception.pbc.createfileexception", message);
     }
 }

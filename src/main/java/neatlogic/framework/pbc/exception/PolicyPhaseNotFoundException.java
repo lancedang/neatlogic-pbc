@@ -23,6 +23,6 @@ public class PolicyPhaseNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 9103846074325204632L;
 
     public PolicyPhaseNotFoundException(String phase) {
-        super("阶段“" + phase + "”不存在");
+        super("exception.pbc.policyphasenotfoundexception", phase);
     }
 }

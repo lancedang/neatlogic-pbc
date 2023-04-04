@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class CannotCreateDirException extends ApiRuntimeException {
     public CannotCreateDirException(String filePath) {
-        super("创建目录“" + filePath + "失败”");
+        super("exception.pbc.cannotcreatedirexception", filePath);
     }
 }

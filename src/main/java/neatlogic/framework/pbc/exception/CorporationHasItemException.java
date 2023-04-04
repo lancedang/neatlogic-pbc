@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class CorporationHasItemException extends ApiRuntimeException {
     public CorporationHasItemException(int count) {
-        super("当前机构包含" + count + "条上报数据，清先删除");
+        super("exception.pbc.corporationhasitemexception", count);
     }
 }

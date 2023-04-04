@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class PhaseHandlerNotFoundException extends ApiRuntimeException {
     public PhaseHandlerNotFoundException(String phase) {
-        super("同步阶段处理器“" + phase + "”不存在");
+        super("exception.pbc.phasehandlernotfoundexception", phase);
     }
 }

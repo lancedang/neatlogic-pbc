@@ -22,7 +22,7 @@ public class ReportResultLackParamException extends ApiRuntimeException {
     private static final long serialVersionUID = -8101125042160971435L;
 
     public ReportResultLackParamException(String param) {
-        super("上报反馈结果缺少参数：" + param);
+        super("exception.pbc.reportresultlackparamexception", param);
     }
 
 }
