@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class LoginFailedException extends ApiRuntimeException {
     public LoginFailedException() {
-        super("登录失败");
+        super("exception.pbc.loginfailedexception");
     }
 }
