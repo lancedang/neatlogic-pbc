@@ -44,7 +44,7 @@ public class ResetPolicyAuditStatusStartupHandler extends StartupBase {
     }
 
     @Override
-    public void executeForCurrentTenant() {
+    public int executeForCurrentTenant() {
         List<PolicyAuditVo> policyAuditList = policyMapper.getRunningPolicyAuditByServerId(Config.SCHEDULE_SERVER_ID);
         if (CollectionUtils.isNotEmpty(policyAuditList)) {
             for (PolicyAuditVo policyAuditVo : policyAuditList) {
@@ -62,10 +62,7 @@ public class ResetPolicyAuditStatusStartupHandler extends StartupBase {
                 policyMapper.updatePolicyAudit(policyAuditVo);
             }
         }
+        return 0;
     }
 
-    @Override
-    public void executeForAllTenant() {
-
-    }
 }
