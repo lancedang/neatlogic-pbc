@@ -1,6 +1,16 @@
+<p align="left">
+    <a href="https://opensource.org/licenses/Apache-2.0" alt="License">
+        <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" /></a>
+<a target="_blank" href="https://join.slack.com/t/neatlogichome/shared_invite/zt-1w037axf8-r_i2y4pPQ1Z8FxOkAbb64w">
+<img src="https://img.shields.io/badge/Slack-Neatlogic-orange" /></a>
+</p>
+
+---
+
 ## 关于
 
-neatlogic-pbc能帮助用户根据《金融信息基础设施管理平台接入规范》的要求上报数据，如果使用neatlogic-cmdb，可以通过策略定时抽取数据并上报，也可以脱离neatlogic-cmdb自行录入上报。支持通过扩展模块覆盖内部上报流程，实现个性化上报。
+neatlogic-pbc能帮助用户根据《金融信息基础设施管理平台接入规范》的要求上报数据，如果使用[neatlogic-cmdb](../../../neatlogic-cmdb/blob/develop3.0.0/README.md)
+，可以通过策略定时抽取数据并上报，也可以脱离neatlogic-cmdb自行录入上报。支持通过扩展模块覆盖内部上报流程，实现个性化上报。
 
 ## 主要功能
 
