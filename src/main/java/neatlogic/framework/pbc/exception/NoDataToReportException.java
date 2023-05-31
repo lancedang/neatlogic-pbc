@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class NoDataToReportException extends ApiRuntimeException {
     public NoDataToReportException() {
-        super("exception.pbc.nodatatoreportexception");
+        super("exception.nodatatoreport");
     }
 }

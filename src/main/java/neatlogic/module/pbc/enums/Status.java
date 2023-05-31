@@ -22,10 +22,10 @@ import neatlogic.framework.util.I18nUtils;
  * 策略执行状态
  */
 public enum Status {
-    PENDING("pending", "enum.pbc.status.pending"),
-    RUNNING("running", "enum.pbc.status.running"),
-    SUCCESS("success", "enum.pbc.status.success.b"),
-    FAILED("failed", "enum.pbc.status.failed.b");
+    PENDING("pending", "common.ready"),
+    RUNNING("running", "common.ongoing"),
+    SUCCESS("success", "common.succeed"),
+    FAILED("failed", "common.failed");
 
     private final String value;
     private final String text;

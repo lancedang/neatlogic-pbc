@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class InterfacePropertyNotFoundException extends ApiRuntimeException {
     public InterfacePropertyNotFoundException(String interfaceId) {
-        super("exception.pbc.interfacepropertynotfoundexception", interfaceId);
+        super("common.humanr", interfaceId);
     }
 }

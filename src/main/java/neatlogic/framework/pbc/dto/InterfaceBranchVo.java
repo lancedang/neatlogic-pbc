@@ -39,7 +39,7 @@ public class InterfaceBranchVo extends BasePageVo {
         HANDLER_SUCCESS("handler_success","enum.pbc.status.handler_success"),
         HANDLER_FAILED("handler_failed","enum.pbc.status.handler_failed"),
         PART_HANDLER_FAILED("part_handler_failed","enum.pbc.status.part_handler_failed"),
-        HANDLER_DOING("handler_doing","enum.pbc.status.handler_doing");
+        HANDLER_DOING("handler_doing","common.doing");
 
         private final String type;
         private final String text;

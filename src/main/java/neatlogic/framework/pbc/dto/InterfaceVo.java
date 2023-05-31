@@ -31,7 +31,7 @@ public class InterfaceVo extends BasePageVo {
     public enum Status {
         VALIDATING("validating", "enum.pbc.status.validating.a"),
         REPORTING("reporting", "enum.pbc.status.reporting"),
-        MAPPING("mapping", "enum.pbc.status.mapping");
+        MAPPING("mapping", "common.synchronizing");
         private final String type;
         private final String text;
 
@@ -59,7 +59,7 @@ public class InterfaceVo extends BasePageVo {
     }
 
     public enum Priority {
-        VIEW("view", "enum.pbc.priority.view"), CI("ci", "enum.pbc.priority.ci");
+        VIEW("view", "enum.pbc.priority.view"), CI("ci", "common.ci");
         private final String type;
         private final String text;
 

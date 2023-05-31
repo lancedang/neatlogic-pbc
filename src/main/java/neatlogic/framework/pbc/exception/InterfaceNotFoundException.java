@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class InterfaceNotFoundException extends ApiRuntimeException {
     public InterfaceNotFoundException(String interfaceId) {
-        super("exception.pbc.interfacenotfoundexception", interfaceId);
+        super("common.humanr", interfaceId);
     }
 }
