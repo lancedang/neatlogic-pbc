@@ -29,7 +29,7 @@ import java.util.Objects;
 
 public class InterfaceVo extends BasePageVo {
     public enum Status {
-        VALIDATING("validating", "enum.pbc.status.validating"),
+        VALIDATING("validating", "enum.pbc.status.validating.a"),
         REPORTING("reporting", "enum.pbc.status.reporting"),
         MAPPING("mapping", "enum.pbc.status.mapping");
         private final String type;

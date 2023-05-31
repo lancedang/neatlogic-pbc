@@ -31,10 +31,10 @@ import org.apache.commons.lang3.StringUtils;
 public class InterfaceBranchVo extends BasePageVo {
 
     public enum Status {
-        SUCCESS("success", "enum.pbc.status.success"),
-        FAILED("failed", "enum.pbc.status.failed"),
-        VALIDATING("validating", "enum.pbc.status.validating.1"),
-        VALID("valid", "enum.pbc.status.valid"),
+        SUCCESS("success", "enum.pbc.status.success.a"),
+        FAILED("failed", "enum.pbc.status.failed.a"),
+        VALIDATING("validating", "enum.pbc.status.validating.b"),
+        VALID("valid", "enum.pbc.status.valid.a"),
         INVALID("invalid", "enum.pbc.status.invalid"),
         HANDLER_SUCCESS("handler_success","enum.pbc.status.handler_success"),
         HANDLER_FAILED("handler_failed","enum.pbc.status.handler_failed"),

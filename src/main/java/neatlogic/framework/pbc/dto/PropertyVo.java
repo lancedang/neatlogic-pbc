@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 public class PropertyVo extends BasePageVo {
     public enum InputType {
         TEXT("text", "enum.pbc.inputtype.text"),
-        DATE("date", "enum.pbc.inputtype.date"),
+        DATE("date", "enum.pbc.inputtype.date.a"),
         DATETIME("datetime", "enum.pbc.inputtype.datetime"),
         SELECT("select", "enum.pbc.inputtype.select"),
         UUID("uuid", "enum.pbc.inputtype.uuid"),

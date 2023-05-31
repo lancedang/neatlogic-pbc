@@ -24,8 +24,8 @@ import neatlogic.framework.util.I18nUtils;
 public enum Status {
     PENDING("pending", "enum.pbc.status.pending"),
     RUNNING("running", "enum.pbc.status.running"),
-    SUCCESS("success", "enum.pbc.status.success.1"),
-    FAILED("failed", "enum.pbc.status.failed.1");
+    SUCCESS("success", "enum.pbc.status.success.b"),
+    FAILED("failed", "enum.pbc.status.failed.b");
 
     private final String value;
     private final String text;
