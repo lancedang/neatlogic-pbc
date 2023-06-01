@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class InterfaceIdIsEmptyException extends ApiRuntimeException {
     public InterfaceIdIsEmptyException() {
-        super("exception.pbc.interfaceidisemptyexception");
+        super("接口id不能为空");
     }
 }

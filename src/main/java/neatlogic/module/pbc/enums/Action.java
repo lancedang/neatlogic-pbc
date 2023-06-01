@@ -19,9 +19,9 @@ package neatlogic.module.pbc.enums;
 import neatlogic.framework.util.I18nUtils;
 
 public enum Action {
-    NEW("new", "common.new"),
-    UPDATE("update", "common.update"),
-    DELETE("delete", "common.delete");
+    NEW("new", "新增"),
+    UPDATE("update", "更新"),
+    DELETE("delete", "删除");
 
     private final String value;
     private final String text;

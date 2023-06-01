@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class InterfaceMappingNotFoundException extends ApiRuntimeException {
     public InterfaceMappingNotFoundException(String interfaceId) {
-        super("exception.pbc.interfacemappingnotfoundexception", interfaceId);
+        super("人行上报接口“{0}”还没有配置属性映射", interfaceId);
     }
 }

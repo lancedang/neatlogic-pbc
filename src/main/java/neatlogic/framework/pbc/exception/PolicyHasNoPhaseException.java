@@ -21,6 +21,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class PolicyHasNoPhaseException extends ApiRuntimeException {
 
     public PolicyHasNoPhaseException() {
-        super("exception.pbc.policyhasnophaseexception");
+        super("当前策略没有任何执行阶段，请先配置");
     }
 }

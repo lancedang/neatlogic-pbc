@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class CategoryParentLoopException extends ApiRuntimeException {
     public CategoryParentLoopException() {
-        super("exception.pbc.categoryparentloopexception");
+        super("父类型存在循环引用");
     }
 }

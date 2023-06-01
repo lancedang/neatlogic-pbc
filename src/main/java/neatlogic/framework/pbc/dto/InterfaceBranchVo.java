@@ -31,15 +31,15 @@ import org.apache.commons.lang3.StringUtils;
 public class InterfaceBranchVo extends BasePageVo {
 
     public enum Status {
-        SUCCESS("success", "enum.pbc.status.success.a"),
-        FAILED("failed", "enum.pbc.status.failed.a"),
-        VALIDATING("validating", "enum.pbc.status.validating.b"),
-        VALID("valid", "enum.pbc.status.valid.a"),
-        INVALID("invalid", "enum.pbc.status.invalid"),
-        HANDLER_SUCCESS("handler_success","enum.pbc.status.handler_success"),
-        HANDLER_FAILED("handler_failed","enum.pbc.status.handler_failed"),
-        PART_HANDLER_FAILED("part_handler_failed","enum.pbc.status.part_handler_failed"),
-        HANDLER_DOING("handler_doing","common.doing");
+        SUCCESS("success", "上报成功"),
+        FAILED("failed", "上报失败"),
+        VALIDATING("validating", "核验中"),
+        VALID("valid", "核验通过"),
+        INVALID("invalid", "核验不通过"),
+        HANDLER_SUCCESS("handler_success","处理成功"),
+        HANDLER_FAILED("handler_failed","处理失败"),
+        PART_HANDLER_FAILED("part_handler_failed","部分处理失败"),
+        HANDLER_DOING("handler_doing","处理中");
 
         private final String type;
         private final String text;

@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class InterfacePropertyNotFoundException extends ApiRuntimeException {
     public InterfacePropertyNotFoundException(String interfaceId) {
-        super("common.humanr", interfaceId);
+        super("人行上报接口“{0}”不存在", interfaceId);
     }
 }

@@ -22,7 +22,7 @@ public class ReportResultNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 3105263035004636797L;
 
     public ReportResultNotFoundException() {
-        super("exception.pbc.reportresultnotfoundexception");
+        super("没有找到上报批次信息");
     }
 
 }

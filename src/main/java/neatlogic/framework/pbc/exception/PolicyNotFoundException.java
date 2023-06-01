@@ -22,6 +22,6 @@ public class PolicyNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = -113765961260899671L;
 
     public PolicyNotFoundException() {
-        super("exception.pbc.policynotfoundexception");
+        super("策略为空");
     }
 }

@@ -34,14 +34,14 @@ import java.util.regex.Pattern;
 
 public class PropertyVo extends BasePageVo {
     public enum InputType {
-        TEXT("text", "common.textbox"),
-        DATE("date", "common.date"),
-        DATETIME("datetime", "common.time"),
-        SELECT("select", "common.select"),
-        UUID("uuid", "enum.pbc.inputtype.uuid"),
-        BOOLEAN("boolean", "enum.pbc.inputtype.boolean"),
-        RELSELECT("relselect", "enum.pbc.inputtype.relselect"),
-        CATEGORY("category", "enum.pbc.inputtype.category");
+        TEXT("text", "文本框"),
+        DATE("date", "日期"),
+        DATETIME("datetime", "时间"),
+        SELECT("select", "下拉框"),
+        UUID("uuid", "全局唯一标识"),
+        BOOLEAN("boolean", "布尔选择"),
+        RELSELECT("relselect", "关联关系"),
+        CATEGORY("category", "设施分类编码");
         private final String type;
         private final String text;
 

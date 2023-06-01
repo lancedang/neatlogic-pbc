@@ -22,10 +22,10 @@ import neatlogic.framework.util.I18nUtils;
  * 策略执行状态
  */
 public enum Status {
-    PENDING("pending", "common.ready"),
-    RUNNING("running", "common.ongoing"),
-    SUCCESS("success", "common.succeed"),
-    FAILED("failed", "common.failed");
+    PENDING("pending", "已就绪"),
+    RUNNING("running", "进行中"),
+    SUCCESS("success", "已成功"),
+    FAILED("failed", "已失败");
 
     private final String value;
     private final String text;

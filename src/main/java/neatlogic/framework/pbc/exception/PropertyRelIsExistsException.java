@@ -21,6 +21,6 @@ import neatlogic.framework.pbc.dto.PropertyRelVo;
 
 public class PropertyRelIsExistsException extends ApiRuntimeException {
     public PropertyRelIsExistsException(PropertyRelVo propertyRelVo) {
-        super("exception.pbc.propertyrelisexistsexception", propertyRelVo.getToInterfaceId());
+        super("当前属性到接口“{0}”的关系已存在，请勿重复添加", propertyRelVo.getToInterfaceId());
     }
 }

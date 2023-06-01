@@ -21,6 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class PropertyIsExistsException extends ApiRuntimeException {
     public PropertyIsExistsException(String propertyId, String complexId) {
-        super("exception.pbc.propertyisexistsexception", (StringUtils.isNotBlank(complexId) ? complexId + "-" : ""), propertyId);
+        super("属性“{1}-{0}”已存在", (StringUtils.isNotBlank(complexId) ? complexId + "-" : ""), propertyId);
     }
 }

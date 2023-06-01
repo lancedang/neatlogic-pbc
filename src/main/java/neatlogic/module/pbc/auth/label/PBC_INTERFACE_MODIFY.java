@@ -21,12 +21,12 @@ import neatlogic.framework.auth.core.AuthBase;
 public class PBC_INTERFACE_MODIFY extends AuthBase {
     @Override
     public String getAuthDisplayName() {
-        return "auth.pbc.pbcinterfacemodify.name";
+        return "金融信息基础设施管理平台数据上报管理权限";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "auth.pbc.pbcinterfacemodify.introduction";
+        return "对金融信息基础设施管理平台数据上报相关功能进行管理和操作权限";
     }
 
     @Override

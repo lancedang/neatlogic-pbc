@@ -21,6 +21,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class PolicyAuditNotFoundException extends ApiRuntimeException {
 
     public PolicyAuditNotFoundException(Long auditId) {
-        super("exception.pbc.policyauditnotfoundexception", auditId);
+        super("执行记录{0}不存在", auditId);
     }
 }

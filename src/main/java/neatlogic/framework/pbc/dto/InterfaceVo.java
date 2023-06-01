@@ -29,9 +29,9 @@ import java.util.Objects;
 
 public class InterfaceVo extends BasePageVo {
     public enum Status {
-        VALIDATING("validating", "enum.pbc.status.validating.a"),
-        REPORTING("reporting", "enum.pbc.status.reporting"),
-        MAPPING("mapping", "common.synchronizing");
+        VALIDATING("validating", "校验中"),
+        REPORTING("reporting", "上报中"),
+        MAPPING("mapping", "同步中");
         private final String type;
         private final String text;
 
@@ -59,7 +59,7 @@ public class InterfaceVo extends BasePageVo {
     }
 
     public enum Priority {
-        VIEW("view", "enum.pbc.priority.view"), CI("ci", "common.ci");
+        VIEW("view", "视图"), CI("ci", "模型");
         private final String type;
         private final String text;
 

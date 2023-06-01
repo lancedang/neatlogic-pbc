@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class CategoryIsInUsedException extends ApiRuntimeException {
     public CategoryIsInUsedException() {
-        super("exception.pbc.categoryisinusedexception");
+        super("当前类型正在被接口使用，无法删除");
     }
 }

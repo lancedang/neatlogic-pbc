@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class InterfaceItemNotFoundException extends ApiRuntimeException {
     public InterfaceItemNotFoundException(Long interfaceItemId) {
-        super("exception.pbc.interfaceitemnotfoundexception", interfaceItemId);
+        super("人行上报接口数据“{0}”不存在", interfaceItemId);
     }
 }

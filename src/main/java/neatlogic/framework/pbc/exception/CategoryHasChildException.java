@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class CategoryHasChildException extends ApiRuntimeException {
     public CategoryHasChildException() {
-        super("exception.pbc.categoryhaschildexception");
+        super("当前类型存在子类型，请先删除");
     }
 }

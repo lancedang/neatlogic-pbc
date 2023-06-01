@@ -23,6 +23,6 @@ public class InterfaceItemIrregularException extends ApiRuntimeException {
     private static final long serialVersionUID = 8654214152219794713L;
 
     public InterfaceItemIrregularException(int errorCount) {
-        super("exception.pbc.interfaceitemirregularexception", errorCount);
+        super("上报数据在本地校验时发现 {0} 条数据有异常，请修改数据再重新同步", errorCount);
     }
 }

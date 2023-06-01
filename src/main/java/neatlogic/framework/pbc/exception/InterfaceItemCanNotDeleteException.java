@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class InterfaceItemCanNotDeleteException extends ApiRuntimeException {
     public InterfaceItemCanNotDeleteException(Long interfaceItemId) {
-        super("exception.pbc.interfaceitemcannotdeleteexception", interfaceItemId);
+        super("人行上报接口数据“{0}”已经导入，不能直接删除。", interfaceItemId);
     }
 }
