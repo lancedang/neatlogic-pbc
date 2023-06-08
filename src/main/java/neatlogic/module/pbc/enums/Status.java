@@ -16,7 +16,7 @@
 
 package neatlogic.module.pbc.enums;
 
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 
 /**
  * 策略执行状态
@@ -40,7 +40,7 @@ public enum Status {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text);
+        return $.t(text);
     }
 
     public static String getValue(String _status) {

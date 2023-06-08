@@ -19,7 +19,7 @@ package neatlogic.framework.pbc.dto;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.restful.annotation.EntityField;
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class InterfaceVo extends BasePageVo {
         }
 
         public String getText() {
-            return I18nUtils.getMessage(text);
+            return $.t(text);
         }
 
         public static String getText(String name) {
@@ -73,7 +73,7 @@ public class InterfaceVo extends BasePageVo {
         }
 
         public String getText() {
-            return I18nUtils.getMessage(text);
+            return $.t(text);
         }
 
         public static String getText(String name) {

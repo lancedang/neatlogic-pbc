@@ -17,7 +17,7 @@
 package neatlogic.framework.pbc.dto;
 
 import neatlogic.framework.common.dto.BasePageVo;
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -54,7 +54,7 @@ public class InterfaceBranchVo extends BasePageVo {
         }
 
         public String getText() {
-            return I18nUtils.getMessage(text);
+            return $.t(text);
         }
 
         public static String getText(String name) {
