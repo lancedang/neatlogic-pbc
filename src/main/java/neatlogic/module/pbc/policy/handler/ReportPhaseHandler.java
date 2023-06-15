@@ -16,19 +16,17 @@
 
 package neatlogic.module.pbc.policy.handler;
 
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import neatlogic.framework.integration.authentication.enums.AuthenticateType;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.pbc.dto.*;
-import neatlogic.framework.util.GzipUtil;
-import neatlogic.framework.util.HttpRequestUtil;
 import neatlogic.framework.pbc.exception.LoginFailedException;
 import neatlogic.framework.pbc.exception.NoDataToReportException;
 import neatlogic.framework.pbc.exception.PhaseException;
 import neatlogic.framework.pbc.policy.core.PhaseHandlerBase;
+import neatlogic.framework.util.GzipUtil;
+import neatlogic.framework.util.HttpRequestUtil;
 import neatlogic.module.pbc.utils.ConfigManager;
 import neatlogic.module.pbc.utils.TokenUtil;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -87,6 +85,8 @@ public class ReportPhaseHandler extends PhaseHandlerBase {
             } catch (Exception ignored) {
 
             }
+        } else {
+            reportData.put("branchId", "");
         }
         JSONArray dataList = new JSONArray();
 
@@ -102,9 +102,15 @@ public class ReportPhaseHandler extends PhaseHandlerBase {
             }
             dataList.add(interfaceData);
         }
+        System.out.println("========发送批量数据元start=======");
+        System.out.println(dataList.toJSONString());
+        System.out.println("========发送批量数据元end=======");
+
         reportData.put("data", GzipUtil.compress(dataList.toJSONString()));
         //reportData.put("data", dataList.toJSONString());
         String result = sendReportData(policyVo.getCorporationId(), reportData);
+        System.out.println("==========发送批量数据元结果==========");
+        System.out.println(result);
         JSONObject resultObj = JSONObject.parseObject(result);
         //处理成功需要修改interfaceItem状态
         if (resultObj.getString("code").equals("WL-10000")) {
@@ -115,11 +121,21 @@ public class ReportPhaseHandler extends PhaseHandlerBase {
 
 
     private String sendReportData(Long corporationId, JSONObject reportData) {
+        System.out.println("=======开始发送数据========");
         String token = TokenUtil.getToken(corporationId);
+        System.out.println("========动态token=========");
+        System.out.println(token);
+
         if (StringUtils.isBlank(token)) {
             throw new LoginFailedException();
         }
-        HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(ConfigManager.getConfig(corporationId).getReportUrl()).setTenant(TenantContext.get().getTenantUuid()).addHeader("X-Access-Token", token).setAuthType(AuthenticateType.BASIC).setUsername("techsure").setPassword("x15wDEzSbBL6tV1W").setPayload(reportData.toJSONString()).sendRequest();
+        HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(ConfigManager.getConfig(corporationId).getReportUrl())
+                //.setTenant(TenantContext.get().getTenantUuid())
+                .addHeader("X-Access-Token", token)
+                //.setAuthType(AuthenticateType.BASIC)
+                //.setUsername("techsure")
+                //.setPassword("x15wDEzSbBL6tV1W")
+                .setPayload(reportData.toJSONString()).sendRequest();
         if (StringUtils.isNotBlank(httpRequestUtil.getError())) {
             throw new PhaseException(httpRequestUtil.getError());
         } else {

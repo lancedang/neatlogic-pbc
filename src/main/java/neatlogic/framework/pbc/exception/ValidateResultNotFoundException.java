@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package neatlogic.framework.pbc.policy.core;
+package neatlogic.framework.pbc.exception;
 
-/*
-此类用于定义阶段的执行顺序，如果需要修改顺序或加入自定义阶段，需要在自定义模块中覆盖此类
- */
-public class PhaseDefine {
-    public String[] getPhaseList() {
-        return new String[]{"sync", "collect", "report", "validate", "selectdata", "getresult"};
-        //return new String[]{"sync", "collect", "createfile"};
+import neatlogic.framework.exception.core.ApiRuntimeException;
+
+public class ValidateResultNotFoundException extends ApiRuntimeException {
+    private static final long serialVersionUID = 3105263035004636797L;
+
+    public ValidateResultNotFoundException() {
+        super("没有找到数据元检核请求返回信息");
     }
+
 }

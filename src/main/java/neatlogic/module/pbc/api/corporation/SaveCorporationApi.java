@@ -65,6 +65,7 @@ public class SaveCorporationApi extends PrivateApiComponentBase {
             @Param(name = "reportUrl", type = ApiParamType.STRING, isRequired = true, xss = true, desc = "上报数据地址"),
             //@Param(name = "importUrl", type = ApiParamType.STRING, isRequired = true, xss = true, desc = "入库申请地址"),
             @Param(name = "validUrl", type = ApiParamType.STRING, isRequired = true, xss = true, desc = "申请检核地址"),
+            @Param(name = "selectDataUrl", type = ApiParamType.STRING, isRequired = true, xss = true, desc = "查询数据处理状态"),
             @Param(name = "validResultUrl", type = ApiParamType.STRING, isRequired = true, xss = true, desc = "查询检核结果地址"),
             @Param(name = "authType", type = ApiParamType.STRING, isRequired = true, xss = true, desc = "认证类型"),
             @Param(name = "clientId", type = ApiParamType.STRING, isRequired = true, xss = true, desc = "客户端ID"),

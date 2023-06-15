@@ -28,6 +28,8 @@ public class CorporationConfigVo implements Serializable {
     private String reportUrl;
     @EntityField(name = "入库申请地址", type = ApiParamType.STRING)
     private String importUrl;
+    @EntityField(name = "查询数据处理状态地址", type = ApiParamType.STRING)
+    private String selectDataUrl;
     @EntityField(name = "申请检核地址", type = ApiParamType.STRING)
     private String validUrl;
     @EntityField(name = "查询检核结果地址", type = ApiParamType.STRING)
@@ -45,6 +47,13 @@ public class CorporationConfigVo implements Serializable {
     @EntityField(name = "轮询间隔", type = ApiParamType.INTEGER)
     private Integer pollInterval;
 
+    public String getSelectDataUrl() {
+        return selectDataUrl;
+    }
+
+    public void setSelectDataUrl(String selectDataUrl) {
+        this.selectDataUrl = selectDataUrl;
+    }
 
     public String getLoginUrl() {
         return loginUrl;

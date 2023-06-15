@@ -18,12 +18,11 @@ package neatlogic.module.pbc.policy.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import neatlogic.framework.integration.authentication.enums.AuthenticateType;
 import neatlogic.framework.pbc.dto.*;
 import neatlogic.framework.pbc.exception.LoginFailedException;
 import neatlogic.framework.pbc.exception.PhaseException;
 import neatlogic.framework.pbc.exception.ReportResultLackParamException;
-import neatlogic.framework.pbc.exception.ReportResultNotFoundException;
+import neatlogic.framework.pbc.exception.ValidateResultNotFoundException;
 import neatlogic.framework.pbc.policy.core.PhaseHandlerBase;
 import neatlogic.framework.util.HttpRequestUtil;
 import neatlogic.module.pbc.utils.ConfigManager;
@@ -97,20 +96,26 @@ public class GetResultPhaseHandler extends PhaseHandlerBase {
 
     @Override
     protected String myExecute(PolicyAuditVo policyAuditVo, PolicyVo policyVo, PolicyPhaseVo policyPhaseVo, List<InterfaceVo> interfaceList) {
-        PolicyPhaseVo reportPhaseVo = policyMapper.getPolicyPhaseByAuditIdAndPhase(policyAuditVo.getId(), "report");
-        //System.out.println("执行" + policyPhaseVo.getExecCount() + "次");
-        if (reportPhaseVo == null || StringUtils.isBlank(reportPhaseVo.getResult())) {
+        PolicyPhaseVo validatePhaseVo = policyMapper.getPolicyPhaseByAuditIdAndPhase(policyAuditVo.getId(), "validate");
+        /*if (StringUtils.isBlank(policyPhaseVo.getPrevResult())) {
             throw new ReportResultNotFoundException();
+        }*/
+        //System.out.println("执行" + policyPhaseVo.getExecCount() + "次");
+        if (validatePhaseVo == null || StringUtils.isBlank(validatePhaseVo.getResult())) {
+            throw new ValidateResultNotFoundException();
         }
-        JSONObject jsonObj = JSONObject.parseObject(reportPhaseVo.getResult());
-        if (StringUtils.isBlank(jsonObj.getString("branchId"))) {
-            throw new ReportResultLackParamException("branchId");
+        JSONObject jsonObj = JSONObject.parseObject(validatePhaseVo.getResult());
+        //JSONObject jsonObj = JSONObject.parseObject(policyPhaseVo.getPrevResult());
+        if (StringUtils.isBlank(jsonObj.getString("groupId"))) {
+            throw new ReportResultLackParamException("groupId");
         }
-        String branchId = jsonObj.getString("branchId");
+        String groupId = jsonObj.getString("groupId");
         JSONObject data = new JSONObject();
 
         data.put("facilityOwnerAgency", ConfigManager.getConfig(policyVo.getCorporationId()).getFacilityOwnerAgency());
-        data.put("branchId", branchId);
+        data.put("groupId", groupId);
+        System.out.println("=======获取数据核验结果数据=======");
+        System.out.println(data.toJSONString());
         String result = sendData(policyVo.getCorporationId(), data);
         JSONObject resultObj = JSONObject.parseObject(result);
         if (resultObj.getString("code").equals("WL-10009")) {
@@ -137,9 +142,6 @@ public class GetResultPhaseHandler extends PhaseHandlerBase {
         HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(ConfigManager.getConfig(corporationId).getValidResultUrl())
                 .setTenant(TenantContext.get().getTenantUuid())
                 .addHeader("X-Access-Token", token)
-                .setAuthType(AuthenticateType.BASIC)
-                .setUsername("techsure")
-                .setPassword("x15wDEzSbBL6tV1W")
                 .setPayload(reportData.toJSONString())
                 .sendRequest();
         if (StringUtils.isNotBlank(httpRequestUtil.getError())) {
