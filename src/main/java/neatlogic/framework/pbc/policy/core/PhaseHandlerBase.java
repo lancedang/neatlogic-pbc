@@ -16,6 +16,7 @@
 
 package neatlogic.framework.pbc.policy.core;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.asynchronization.threadpool.ScheduledThreadPool;
@@ -27,10 +28,11 @@ import neatlogic.framework.pbc.dto.InterfaceVo;
 import neatlogic.framework.pbc.dto.PolicyAuditVo;
 import neatlogic.framework.pbc.dto.PolicyPhaseVo;
 import neatlogic.framework.pbc.dto.PolicyVo;
-import neatlogic.module.pbc.enums.Status;
+import neatlogic.framework.pbc.exception.PhaseException;
 import neatlogic.framework.pbc.exception.PhaseHandlerNotFoundException;
+import neatlogic.framework.pbc.exception.PhaseNotCompletedException;
 import neatlogic.framework.pbc.exception.PolicyPhaseNotFoundException;
-import com.alibaba.fastjson.JSONObject;
+import neatlogic.module.pbc.enums.Status;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -87,7 +89,7 @@ public abstract class PhaseHandlerBase implements IPhaseHandler {
                     policyPhaseVo.setConfig(p.getJSONObject(policyPhaseVo.getPhase()));
                     delay = policyPhaseVo.getConfig().getIntValue("delay");
                     //需要加上已经执行的次数
-                    policyPhaseVo.setRetryCount(policyPhaseVo.getConfig().getIntValue("retryCount") + (!isRetry ? policyPhaseVo.getExecCount() : 0));
+                    policyPhaseVo.setRetryCount(policyPhaseVo.getConfig().getIntValue("retryCount") + policyPhaseVo.getExecCount());
                     policyPhaseVo.setRetryInterval(policyPhaseVo.getConfig().getIntValue("retryInterval"));
                 }
             }
@@ -126,8 +128,10 @@ public abstract class PhaseHandlerBase implements IPhaseHandler {
         }, isRetry ? 0L : delay * 60L);
     }
 
+
     private void executeCurrentPhase(PolicyAuditVo policyAuditVo, PolicyPhaseVo policyPhaseVo) {
         policyPhaseVo.setExecCount(policyPhaseVo.getExecCount() + 1);
+        policyMapper.updatePolicyPhaseExecCount(policyPhaseVo);
         PolicyPhaseVo phaseStatusVo = policyMapper.getPolicyPhaseByAuditIdAndPhase(policyAuditVo.getId(), this.getPhase());
         if (!phaseStatusVo.getStatus().equals(Status.RUNNING.getValue())) {
             policyPhaseVo.setStatus(Status.RUNNING.getValue());
@@ -146,6 +150,13 @@ public abstract class PhaseHandlerBase implements IPhaseHandler {
             policyPhaseVo.setResult(result);
             policyPhaseVo.setStatus(Status.SUCCESS.getValue());
             policyPhaseVo.setError(null);
+        } catch (PhaseNotCompletedException ex) {
+            policyPhaseVo.setStatus(Status.RUNNING.getValue());
+            policyPhaseVo.setResult(ex.getResultObj().toJSONString());
+            policyMapper.updatePolicyPhaseResult(policyPhaseVo);
+        } catch (PhaseException ex) {
+            policyPhaseVo.setStatus(Status.FAILED.getValue());
+            policyPhaseVo.setResult(ex.getResultObj().toJSONString());
         } catch (ApiRuntimeException ex) {
             policyPhaseVo.setError(ex.getMessage());
             policyPhaseVo.setStatus(Status.FAILED.getValue());
@@ -155,7 +166,7 @@ public abstract class PhaseHandlerBase implements IPhaseHandler {
             policyPhaseVo.setStatus(Status.FAILED.getValue());
         }
 
-        if (policyPhaseVo.getStatus().equals(Status.FAILED.getValue())) {
+        if (policyPhaseVo.getStatus().equals(Status.RUNNING.getValue())) {
             if (policyPhaseVo.getRetryCount() > policyPhaseVo.getExecCount() - 1) {
                 IPhaseHandler handler = this;
                 ScheduledThreadPool.execute(new NeatLogicThread("PBC-POLICY-DELAY-HANDLER") {
@@ -170,15 +181,21 @@ public abstract class PhaseHandlerBase implements IPhaseHandler {
                     }
                 }, policyPhaseVo.getRetryInterval() * 60L);
             } else {
+                policyPhaseVo.setResult(new JSONObject() {{
+                    this.put("msg", "重试次数：" + policyPhaseVo.getRetryCount() + "超过重试次数");
+                }}.toJSONString());
+                policyPhaseVo.setStatus(Status.FAILED.getValue());
                 policyMapper.updatePolicyPhase(policyPhaseVo);
-
                 policyAuditVo.setStatus(Status.FAILED.getValue());
-                policyAuditVo.setError(policyPhaseVo.getError());
+                policyAuditVo.setError("重试次数：" + policyPhaseVo.getRetryCount() + "超过重试次数");
                 policyMapper.updatePolicyAudit(policyAuditVo);
             }
+        } else if (policyPhaseVo.getStatus().equals(Status.FAILED.getValue())) {
+            policyMapper.updatePolicyPhase(policyPhaseVo);
+            policyAuditVo.setStatus(Status.FAILED.getValue());
+            policyMapper.updatePolicyAudit(policyAuditVo);
         } else if (policyPhaseVo.getStatus().equals(Status.SUCCESS.getValue())) {
             policyMapper.updatePolicyPhase(policyPhaseVo);
-
             PolicyAuditVo.PolicyPhase newPolicyPhase = policyAuditVo.getCurrentPhase().getNextPhase();
             if (newPolicyPhase != null) {
                 policyAuditVo.setCurrentPhase(newPolicyPhase);

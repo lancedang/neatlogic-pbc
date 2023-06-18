@@ -14,14 +14,28 @@
  * limitations under the License.
  */
 
-package neatlogic.framework.pbc.policy.core;
+package neatlogic.module.pbc.auth.label;
 
-/*
-此类用于定义阶段的执行顺序，如果需要修改顺序或加入自定义阶段，需要在自定义模块中覆盖此类
- */
-public class PhaseDefine {
-    public String[] getPhaseList() {
-        return new String[]{"sync", "collect", "report", "validate", "selectdata"/*, "getresult"*/};
-        //return new String[]{"sync", "collect", "createfile"};
+import neatlogic.framework.auth.core.AuthBase;
+
+public class PBC_BASE extends AuthBase {
+    @Override
+    public String getAuthDisplayName() {
+        return "金融信息基础设施管理平台基础权限";
+    }
+
+    @Override
+    public String getAuthIntroduction() {
+        return "金融信息基础设施管理平台基础权限";
+    }
+
+    @Override
+    public String getAuthGroup() {
+        return "pbc";
+    }
+
+    @Override
+    public Integer getSort() {
+        return 1;
     }
 }

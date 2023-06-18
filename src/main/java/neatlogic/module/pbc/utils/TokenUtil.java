@@ -17,8 +17,10 @@
 package neatlogic.module.pbc.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.integration.authentication.enums.AuthenticateType;
 import neatlogic.framework.pbc.exception.LoginFailedException;
-import neatlogic.framework.pbc.exception.PhaseException;
 import neatlogic.framework.util.HttpRequestUtil;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,15 +37,16 @@ public class TokenUtil {
         System.out.println("=======动态令牌发送的数据========");
         System.out.println(queryString);
         HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(ConfigManager.getConfig(corporationId).getLoginUrl())
-                //.setAuthType(AuthenticateType.BASIC)
-                //.setUsername("techsure")
-                //.setTenant(TenantContext.get().getTenantUuid())
-                //.setPassword("x15wDEzSbBL6tV1W")
-                .setContentType(HttpRequestUtil.ContentType.CONTENT_TYPE_APPLICATION_FORM)
-                .setFormData(paramObj)
+                .setAuthType(AuthenticateType.BASIC)
+                .setUsername("neatlogic")
+                .setTenant(TenantContext.get().getTenantUuid())
+                .setPassword("x15wDEzSbBL6tV1W")
+                //.setContentType(HttpRequestUtil.ContentType.CONTENT_TYPE_APPLICATION_FORM)
+                //.setFormData(paramObj)
+                .setPayload(paramObj.toJSONString())
                 .sendRequest();
         if (StringUtils.isNotBlank(httpRequestUtil.getError())) {
-            throw new PhaseException(httpRequestUtil.getError());
+            throw new ApiRuntimeException(httpRequestUtil.getError());
         } else {
             JSONObject result = httpRequestUtil.getResultJson();
             System.out.println("========动态令牌结果==========");

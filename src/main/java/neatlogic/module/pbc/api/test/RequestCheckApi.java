@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package neatlogic.module.pbc.publicapi;
+package neatlogic.module.pbc.api.test;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.Description;
 import neatlogic.framework.restful.annotation.Input;
@@ -23,23 +24,27 @@ import neatlogic.framework.restful.annotation.OperationType;
 import neatlogic.framework.restful.annotation.Param;
 import neatlogic.framework.restful.constvalue.OperationTypeEnum;
 import neatlogic.framework.restful.core.publicapi.PublicApiComponentBase;
-import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.UuidUtil;
 import org.springframework.stereotype.Service;
 
 
 @Service
-@OperationType(type = OperationTypeEnum.OPERATE)
-public class ReportDataApi extends PublicApiComponentBase {
+@OperationType(type = OperationTypeEnum.SEARCH)
+public class RequestCheckApi extends PublicApiComponentBase {
 
+    @Override
+    public boolean isRaw() {
+        return true;
+    }
 
     @Override
     public String getToken() {
-        return "/webproxy/fig2fics/pshare/api/prod/FICS/api/fics/dataElementInstance/reportData";
+        return "/pbc/test/requestcheck";
     }
 
     @Override
     public String getName() {
-        return "上报数据";
+        return "数据元检核请求测试接口";
     }
 
     @Override
@@ -47,23 +52,18 @@ public class ReportDataApi extends PublicApiComponentBase {
         return null;
     }
 
-    @Override
-    public boolean isRaw() {
-        return true;
-    }
-
-
-    @Input({@Param(name = "grant_type", type = ApiParamType.STRING, desc = "grant_type"),
-            @Param(name = "client_id", type = ApiParamType.STRING, desc = "client_id"),
-            @Param(name = "client_secret", type = ApiParamType.STRING, desc = "client_secret")})
-    @Description(desc = "上报数据接口")
+    @Input({@Param(name = "branchIdList", type = ApiParamType.STRING, isRequired = true, desc = "批次id"),
+            @Param(name = "branchNumber", type = ApiParamType.INTEGER, isRequired = true, desc = "批次数量"),
+            @Param(name = "facilityOwnerAgency", type = ApiParamType.STRING, isRequired = true, desc = "金融机构编码")})
+    @Description(desc = "数据元检核请求测试接口")
     @Override
     public Object myDoService(JSONObject paramObj) throws Exception {
-        System.out.println("上报数据：" + paramObj.toJSONString());
-        return JSONObject.parse("{" +
-                "\"branchId\": \"51244123381A487798AF515092A008C3\"," +
-                "\"code\": \"WL-10000\"," +
-                "\"msg\": \"接收成功\"" +
-                "}");
+        JSONObject data = new JSONObject();
+        data.put("groupId", UuidUtil.randomUuid());
+        data.put("code", "WL-30000");
+        data.put("msg", "接收成功");
+        return data;
     }
+
+
 }

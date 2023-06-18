@@ -18,9 +18,9 @@ package neatlogic.module.pbc.policy.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.pbc.dto.*;
 import neatlogic.framework.pbc.exception.LoginFailedException;
-import neatlogic.framework.pbc.exception.PhaseException;
 import neatlogic.framework.pbc.exception.ReportResultLackParamException;
 import neatlogic.framework.pbc.exception.ValidateResultNotFoundException;
 import neatlogic.framework.pbc.policy.core.PhaseHandlerBase;
@@ -145,7 +145,7 @@ public class GetResultPhaseHandler extends PhaseHandlerBase {
                 .setPayload(reportData.toJSONString())
                 .sendRequest();
         if (StringUtils.isNotBlank(httpRequestUtil.getError())) {
-            throw new PhaseException(httpRequestUtil.getError());
+            throw new ApiRuntimeException(httpRequestUtil.getError());
         } else {
             return httpRequestUtil.getResult();
         }

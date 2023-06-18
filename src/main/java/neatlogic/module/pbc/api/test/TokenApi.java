@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package neatlogic.module.pbc.publicapi;
+package neatlogic.module.pbc.api.test;
 
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.Description;
@@ -29,17 +29,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 @OperationType(type = OperationTypeEnum.OPERATE)
-public class ValidateResultApi extends PublicApiComponentBase {
+public class TokenApi extends PublicApiComponentBase {
 
 
     @Override
     public String getToken() {
-        return "/webproxy/fig2fics/pshare/api/prod/FICS/api/fics/dataElementInstance/selectUploadData";
+        return "/pbc/test/token";
     }
 
     @Override
     public String getName() {
-        return "金融机构端使用此接口发送数据元检核请求";
+        return "登陆";
     }
 
     @Override
@@ -52,31 +52,24 @@ public class ValidateResultApi extends PublicApiComponentBase {
         return true;
     }
 
-
     @Input({@Param(name = "grant_type", type = ApiParamType.STRING, desc = "grant_type"),
             @Param(name = "client_id", type = ApiParamType.STRING, desc = "client_id"),
             @Param(name = "client_secret", type = ApiParamType.STRING, desc = "client_secret")})
-    @Description(desc = "金融机构端使用此接口发送数据元检核请求")
+    @Description(desc = "获取动态令牌接口")
     @Override
     public Object myDoService(JSONObject paramObj) throws Exception {
-        System.out.println("结果审核：" + paramObj.toJSONString());
-        return JSONObject.parse("{\n" +
-                "\"branchId\": \"5f11d9471e33ff0ec08b970c\",\n" +
-                "\"code\": \"WL-10008\",\n" +
-                "\"msg\": \"部分失败\",\n" +
-                "\"data\": [{\n" +
-                "\"code\": \"WL-20001\",\n" +
-                "\"msg\": \"[facilityUsedState]不在填报范围\",\n" +
-                "\"facilityCategory\": \"FAITSERPCS\",\n" +
-                "\"facilityDescriptor\": \"5f11db861e33ff0ec08ba546\"\n" +
-                "},\n" +
-                "{\n" +
-                "\"code\": \"WL-20002 \",\n" +
-                "\"msg\": \"数据处理失败\",\n" +
-                "\"facilityCategory\": \"FAITSERPCS\",\n" +
-                "\"facilityDescriptor\": \"5f14ff501e33ff0ec08dd312\"\n" +
-                "}\n" +
-                "]\n" +
-                "}\n");
+        System.out.println("申请令牌：" + paramObj.toString());
+        return JSONObject.parseObject("{\n" +
+                "            \"access_token\": \"30a8f75012e84a40823c9722dfc23d5c\",\n" +
+                "                \"token_type\": \"bearer\",\n" +
+                "                \"expires_in\": 593,\n" +
+                "                \"scope\": \"read writer\",\n" +
+                "                \"tenant_id\": \"8a8080546e86d42e016f2c8481a00936\",\n" +
+                "                \"client_short_name\": \"A1000*********1\",\n" +
+                "                \"name\": \"A1000153000931_PBC\",\n" +
+                "                \"description\": \"中国人民银行**分行\",\n" +
+                "                \"platform\": \"pshare\",\n" +
+                "                \"client_id\": \"A1000*********1_PBC\"\n" +
+                "        }");
     }
 }

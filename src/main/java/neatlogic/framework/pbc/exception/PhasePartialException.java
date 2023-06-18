@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package neatlogic.framework.pbc.policy.core;
+package neatlogic.framework.pbc.exception;
 
-/*
-此类用于定义阶段的执行顺序，如果需要修改顺序或加入自定义阶段，需要在自定义模块中覆盖此类
- */
-public class PhaseDefine {
-    public String[] getPhaseList() {
-        return new String[]{"sync", "collect", "report", "validate", "selectdata"/*, "getresult"*/};
-        //return new String[]{"sync", "collect", "createfile"};
+import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.pbc.dto.InterfaceItemVo;
+
+import java.util.List;
+
+public class PhasePartialException extends ApiRuntimeException {
+    private List<InterfaceItemVo> errorItemList;
+
+    public PhasePartialException(List<InterfaceItemVo> errorItemList) {
+        this.errorItemList = errorItemList;
+    }
+
+    public List<InterfaceItemVo> getErrorList() {
+        return this.errorItemList;
     }
 }

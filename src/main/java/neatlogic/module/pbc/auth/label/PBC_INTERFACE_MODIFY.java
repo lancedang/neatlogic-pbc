@@ -36,6 +36,6 @@ public class PBC_INTERFACE_MODIFY extends AuthBase {
 
     @Override
     public Integer getSort() {
-        return 1;
+        return 2;
     }
 }

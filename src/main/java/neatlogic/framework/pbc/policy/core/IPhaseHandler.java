@@ -33,10 +33,11 @@ public interface IPhaseHandler {
      */
     void execute(PolicyAuditVo policyAuditVo);
 
+
     /**
      * 获取设置模板
      */
     List<PolicyConfigVo> getConfigTemplate();
 
-    void execute(PolicyAuditVo policyAuditVo, boolean needDelay);
+    void execute(PolicyAuditVo policyAuditVo, boolean isRetry);
 }

@@ -70,5 +70,7 @@ public interface InterfaceItemMapper {
 
     void updateInterfaceItemDataHashByAuditId(Long auditId);
 
+    void updateInterfaceItemDataHashById(Long interfaceItemId);
+
     void deleteInterfaceItemById(Long id);
 }

@@ -16,12 +16,19 @@
 
 package neatlogic.framework.pbc.exception;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class PhaseException extends ApiRuntimeException {
-    private static final long serialVersionUID = -2547353690667263491L;
+    public JSONObject resultObj;
 
-    public PhaseException(String message) {
-        super(message);
+    public PhaseException(JSONObject resultObj) {
+        super();
+        this.resultObj = resultObj;
     }
+
+    public JSONObject getResultObj() {
+        return resultObj;
+    }
+
 }

@@ -18,10 +18,12 @@ package neatlogic.module.pbc.policy.handler;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.integration.authentication.enums.AuthenticateType;
 import neatlogic.framework.pbc.dto.*;
 import neatlogic.framework.pbc.exception.LoginFailedException;
 import neatlogic.framework.pbc.exception.NoDataToReportException;
-import neatlogic.framework.pbc.exception.PhaseException;
 import neatlogic.framework.pbc.policy.core.PhaseHandlerBase;
 import neatlogic.framework.util.GzipUtil;
 import neatlogic.framework.util.HttpRequestUtil;
@@ -95,9 +97,12 @@ public class ReportPhaseHandler extends PhaseHandlerBase {
             interfaceData.put("dataType", interfaceVo.getId());
             JSONArray interfaceDataList = new JSONArray();
             interfaceData.put("dataList", interfaceDataList);
+
             if (CollectionUtils.isNotEmpty(interfaceVo.getInterfaceItemList())) {
                 for (InterfaceItemVo interfaceItemVo : interfaceVo.getInterfaceItemList()) {
-                    interfaceDataList.add(interfaceItemVo.getData());
+                    JSONObject dataObj = interfaceItemVo.getData();
+                    dataObj.put("reportDataType", interfaceItemVo.getAction());
+                    interfaceDataList.add(dataObj);
                 }
             }
             dataList.add(interfaceData);
@@ -113,9 +118,9 @@ public class ReportPhaseHandler extends PhaseHandlerBase {
         System.out.println(result);
         JSONObject resultObj = JSONObject.parseObject(result);
         //处理成功需要修改interfaceItem状态
-        if (resultObj.getString("code").equals("WL-10000")) {
-            interfaceItemMapper.updateInterfaceItemDataHashByAuditId(policyAuditVo.getId());
-        }
+        //if (resultObj.getString("code").equals("WL-10000")) {
+        //    interfaceItemMapper.updateInterfaceItemDataHashByAuditId(policyAuditVo.getId());
+        //}
         return result;
     }
 
@@ -130,14 +135,14 @@ public class ReportPhaseHandler extends PhaseHandlerBase {
             throw new LoginFailedException();
         }
         HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(ConfigManager.getConfig(corporationId).getReportUrl())
-                //.setTenant(TenantContext.get().getTenantUuid())
+                .setTenant(TenantContext.get().getTenantUuid())
                 .addHeader("X-Access-Token", token)
-                //.setAuthType(AuthenticateType.BASIC)
-                //.setUsername("techsure")
-                //.setPassword("x15wDEzSbBL6tV1W")
+                .setAuthType(AuthenticateType.BASIC)
+                .setUsername("neatlogic")
+                .setPassword("x15wDEzSbBL6tV1W")
                 .setPayload(reportData.toJSONString()).sendRequest();
         if (StringUtils.isNotBlank(httpRequestUtil.getError())) {
-            throw new PhaseException(httpRequestUtil.getError());
+            throw new ApiRuntimeException(httpRequestUtil.getError());
         } else {
             return httpRequestUtil.getResult();
         }

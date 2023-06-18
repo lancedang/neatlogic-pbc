@@ -30,6 +30,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class InterfaceItemVo extends BaseEditorVo {
 
@@ -235,6 +236,19 @@ public class InterfaceItemVo extends BaseEditorVo {
             }
         }
         return dataText;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InterfaceItemVo that = (InterfaceItemVo) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     public void setDataText(JSONObject dataText) {

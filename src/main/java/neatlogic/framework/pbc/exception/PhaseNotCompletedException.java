@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package neatlogic.framework.pbc.policy.core;
+package neatlogic.framework.pbc.exception;
+
+import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 
 /*
-此类用于定义阶段的执行顺序，如果需要修改顺序或加入自定义阶段，需要在自定义模块中覆盖此类
+阶段没完成抛出次异常Ï
  */
-public class PhaseDefine {
-    public String[] getPhaseList() {
-        return new String[]{"sync", "collect", "report", "validate", "selectdata"/*, "getresult"*/};
-        //return new String[]{"sync", "collect", "createfile"};
+public class PhaseNotCompletedException extends ApiRuntimeException {
+    private final JSONObject resultObj;
+
+    public PhaseNotCompletedException(JSONObject resultObj) {
+        super();
+        this.resultObj = resultObj;
+    }
+
+    public JSONObject getResultObj() {
+        return resultObj;
     }
 }

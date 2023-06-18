@@ -54,7 +54,11 @@ public interface PolicyMapper {
 
     void insertPolicyInterface(PolicyInterfaceVo policyInterfaceVo);
 
+    void updatePolicyPhaseExecCount(PolicyPhaseVo policyPhaseVo);
+
     void updatePolicyPhase(PolicyPhaseVo policyPhaseVo);
+
+    void updatePolicyPhaseResult(PolicyPhaseVo policyPhaseVo);
 
     void updatePolicyAudit(PolicyAuditVo policyAuditVo);
 
