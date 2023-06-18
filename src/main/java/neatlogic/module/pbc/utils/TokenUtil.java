@@ -41,9 +41,9 @@ public class TokenUtil {
                 .setUsername("neatlogic")
                 .setTenant(TenantContext.get().getTenantUuid())
                 .setPassword("x15wDEzSbBL6tV1W")
-                //.setContentType(HttpRequestUtil.ContentType.CONTENT_TYPE_APPLICATION_FORM)
-                //.setFormData(paramObj)
-                .setPayload(paramObj.toJSONString())
+                .setContentType(HttpRequestUtil.ContentType.CONTENT_TYPE_APPLICATION_FORM)
+                .setFormData(paramObj)
+                //.setPayload(paramObj.toJSONString())
                 .sendRequest();
         if (StringUtils.isNotBlank(httpRequestUtil.getError())) {
             throw new ApiRuntimeException(httpRequestUtil.getError());
