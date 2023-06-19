@@ -18,9 +18,7 @@ package neatlogic.module.pbc.policy.handler;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.exception.core.ApiRuntimeException;
-import neatlogic.framework.integration.authentication.enums.AuthenticateType;
 import neatlogic.framework.pbc.dto.*;
 import neatlogic.framework.pbc.exception.LoginFailedException;
 import neatlogic.framework.pbc.exception.NoDataToReportException;
@@ -107,39 +105,24 @@ public class ReportPhaseHandler extends PhaseHandlerBase {
             }
             dataList.add(interfaceData);
         }
-        System.out.println("========发送批量数据元start=======");
-        System.out.println(dataList.toJSONString());
-        System.out.println("========发送批量数据元end=======");
 
         reportData.put("data", GzipUtil.compress(dataList.toJSONString()));
-        //reportData.put("data", dataList.toJSONString());
-        String result = sendReportData(policyVo.getCorporationId(), reportData);
-        System.out.println("==========发送批量数据元结果==========");
-        System.out.println(result);
-        JSONObject resultObj = JSONObject.parseObject(result);
-        //处理成功需要修改interfaceItem状态
-        //if (resultObj.getString("code").equals("WL-10000")) {
-        //    interfaceItemMapper.updateInterfaceItemDataHashByAuditId(policyAuditVo.getId());
-        //}
-        return result;
+        return sendReportData(policyVo.getCorporationId(), reportData);
     }
 
 
     private String sendReportData(Long corporationId, JSONObject reportData) {
-        System.out.println("=======开始发送数据========");
         String token = TokenUtil.getToken(corporationId);
-        System.out.println("========动态token=========");
-        System.out.println(token);
 
         if (StringUtils.isBlank(token)) {
             throw new LoginFailedException();
         }
         HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(ConfigManager.getConfig(corporationId).getReportUrl())
-                .setTenant(TenantContext.get().getTenantUuid())
+                //.setTenant(TenantContext.get().getTenantUuid())
                 .addHeader("X-Access-Token", token)
-                .setAuthType(AuthenticateType.BASIC)
-                .setUsername("neatlogic")
-                .setPassword("x15wDEzSbBL6tV1W")
+                //.setAuthType(AuthenticateType.BASIC)
+                //.setUsername("neatlogic")
+                //.setPassword("x15wDEzSbBL6tV1W")
                 .setPayload(reportData.toJSONString()).sendRequest();
         if (StringUtils.isNotBlank(httpRequestUtil.getError())) {
             throw new ApiRuntimeException(httpRequestUtil.getError());

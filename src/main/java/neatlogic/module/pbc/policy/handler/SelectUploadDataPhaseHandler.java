@@ -18,9 +18,7 @@ package neatlogic.module.pbc.policy.handler;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.exception.core.ApiRuntimeException;
-import neatlogic.framework.integration.authentication.enums.AuthenticateType;
 import neatlogic.framework.pbc.dto.*;
 import neatlogic.framework.pbc.exception.*;
 import neatlogic.framework.pbc.policy.core.PhaseHandlerBase;
@@ -125,7 +123,13 @@ public class SelectUploadDataPhaseHandler extends PhaseHandlerBase {
         if (StringUtils.isBlank(token)) {
             throw new LoginFailedException();
         }
-        HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(ConfigManager.getConfig(corporationId).getSelectDataUrl()).setTenant(TenantContext.get().getTenantUuid()).addHeader("X-Access-Token", token).setAuthType(AuthenticateType.BASIC).setUsername("neatlogic").setPassword("x15wDEzSbBL6tV1W").setPayload(reportData.toJSONString()).sendRequest();
+        HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(ConfigManager.getConfig(corporationId).getSelectDataUrl())
+                //.setTenant(TenantContext.get().getTenantUuid())
+                .addHeader("X-Access-Token", token)
+                //.setAuthType(AuthenticateType.BASIC)
+                //.setUsername("neatlogic")
+                //.setPassword("x15wDEzSbBL6tV1W")
+                .setPayload(reportData.toJSONString()).sendRequest();
         if (StringUtils.isNotBlank(httpRequestUtil.getError())) {
             throw new ApiRuntimeException(httpRequestUtil.getError());
         } else {

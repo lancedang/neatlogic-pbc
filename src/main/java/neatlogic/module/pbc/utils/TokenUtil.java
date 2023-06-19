@@ -17,9 +17,7 @@
 package neatlogic.module.pbc.utils;
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.exception.core.ApiRuntimeException;
-import neatlogic.framework.integration.authentication.enums.AuthenticateType;
 import neatlogic.framework.pbc.exception.LoginFailedException;
 import neatlogic.framework.util.HttpRequestUtil;
 import org.apache.commons.collections4.MapUtils;
@@ -27,20 +25,15 @@ import org.apache.commons.lang3.StringUtils;
 
 public class TokenUtil {
     public static String getToken(Long corporationId) throws LoginFailedException {
-        String queryString = "grant_type=" + ConfigManager.getConfig(corporationId).getAuthType()
-                + "&client_id=" + ConfigManager.getConfig(corporationId).getClientId()
-                + "&client_secret=" + ConfigManager.getConfig(corporationId).getClientSecret();
         JSONObject paramObj = new JSONObject();
         paramObj.put("grant_type", ConfigManager.getConfig(corporationId).getAuthType());
         paramObj.put("client_id", ConfigManager.getConfig(corporationId).getClientId());
         paramObj.put("client_secret", ConfigManager.getConfig(corporationId).getClientSecret());
-        System.out.println("=======动态令牌发送的数据========");
-        System.out.println(queryString);
         HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(ConfigManager.getConfig(corporationId).getLoginUrl())
-                .setAuthType(AuthenticateType.BASIC)
-                .setUsername("neatlogic")
-                .setTenant(TenantContext.get().getTenantUuid())
-                .setPassword("x15wDEzSbBL6tV1W")
+                //.setAuthType(AuthenticateType.BASIC)
+                //.setUsername("neatlogic")
+                //.setTenant(TenantContext.get().getTenantUuid())
+                //.setPassword("x15wDEzSbBL6tV1W")
                 .setContentType(HttpRequestUtil.ContentType.CONTENT_TYPE_APPLICATION_FORM)
                 .setFormData(paramObj)
                 //.setPayload(paramObj.toJSONString())
@@ -49,8 +42,6 @@ public class TokenUtil {
             throw new ApiRuntimeException(httpRequestUtil.getError());
         } else {
             JSONObject result = httpRequestUtil.getResultJson();
-            System.out.println("========动态令牌结果==========");
-            System.out.println(result.toJSONString());
             if (MapUtils.isNotEmpty(result)) {
                 return result.getString("access_token");
             }

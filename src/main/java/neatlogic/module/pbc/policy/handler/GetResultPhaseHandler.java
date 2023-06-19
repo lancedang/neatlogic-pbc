@@ -17,7 +17,6 @@
 package neatlogic.module.pbc.policy.handler;
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.pbc.dto.*;
 import neatlogic.framework.pbc.exception.LoginFailedException;
@@ -114,8 +113,8 @@ public class GetResultPhaseHandler extends PhaseHandlerBase {
 
         data.put("facilityOwnerAgency", ConfigManager.getConfig(policyVo.getCorporationId()).getFacilityOwnerAgency());
         data.put("groupId", groupId);
-        System.out.println("=======获取数据核验结果数据=======");
-        System.out.println(data.toJSONString());
+        //System.out.println("=======获取数据核验结果数据=======");
+        //System.out.println(data.toJSONString());
         String result = sendData(policyVo.getCorporationId(), data);
         JSONObject resultObj = JSONObject.parseObject(result);
         if (resultObj.getString("code").equals("WL-10009")) {
@@ -140,7 +139,7 @@ public class GetResultPhaseHandler extends PhaseHandlerBase {
             throw new LoginFailedException();
         }
         HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(ConfigManager.getConfig(corporationId).getValidResultUrl())
-                .setTenant(TenantContext.get().getTenantUuid())
+                //.setTenant(TenantContext.get().getTenantUuid())
                 .addHeader("X-Access-Token", token)
                 .setPayload(reportData.toJSONString())
                 .sendRequest();
