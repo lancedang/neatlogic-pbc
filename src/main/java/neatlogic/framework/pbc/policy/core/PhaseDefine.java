@@ -21,7 +21,7 @@ package neatlogic.framework.pbc.policy.core;
  */
 public class PhaseDefine {
     public String[] getPhaseList() {
-        return new String[]{"sync", "collect", "report", "validate", "selectdata"/*, "getresult"*/};
+        return new String[]{"sync", "collect", "report", "validate", "selectdata", "getresult", "createfile"};
         //return new String[]{"sync", "collect", "createfile"};
     }
 }
