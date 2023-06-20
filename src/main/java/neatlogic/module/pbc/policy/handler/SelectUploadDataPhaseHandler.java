@@ -23,6 +23,7 @@ import neatlogic.framework.pbc.dto.*;
 import neatlogic.framework.pbc.exception.*;
 import neatlogic.framework.pbc.policy.core.PhaseHandlerBase;
 import neatlogic.framework.util.HttpRequestUtil;
+import neatlogic.module.pbc.enums.Action;
 import neatlogic.module.pbc.utils.ConfigManager;
 import neatlogic.module.pbc.utils.TokenUtil;
 import org.apache.commons.collections4.CollectionUtils;
@@ -106,7 +107,11 @@ public class SelectUploadDataPhaseHandler extends PhaseHandlerBase {
                     }
                     //剩余的代表处理成功
                     for (InterfaceItemVo itemVo : interfaceItemList) {
-                        interfaceItemMapper.updateInterfaceItemDataHashById(itemVo.getId());
+                        if (itemVo.getAction().equalsIgnoreCase(Action.DELETE.getValue())) {
+                            interfaceItemMapper.deleteInterfaceItemById(itemVo.getId());
+                        } else {
+                            interfaceItemMapper.updateInterfaceItemDataHashById(itemVo.getId());
+                        }
                     }
                     throw new PhaseException(returnObj);
                 }
