@@ -135,5 +135,6 @@ public class PolicyManager {
                 }
             }
         });
+        policyMapper.updatePolicyLastExecDate(policyAuditVo.getPolicyId());
     }
 }

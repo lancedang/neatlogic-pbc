@@ -26,6 +26,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -61,6 +62,8 @@ public class PolicyVo extends BasePageVo {
     private Long corporationId;
     @EntityField(name = "机构名称", type = ApiParamType.STRING)
     private String corporationName;
+    @EntityField(name = "阶段名称列表", type = ApiParamType.STRING)
+    private List<String> phaseTextList;
 
     public Long getId() {
         if (id == null) {
@@ -176,6 +179,24 @@ public class PolicyVo extends BasePageVo {
             }
         }
         return phaseText;
+    }
+
+    public List<String> getPhaseTextList() {
+        List<String> phaseTextList = new ArrayList<>();
+        if (StringUtils.isNotBlank(phase)) {
+            String[] phases = phase.split(",");
+            for (String p : phases) {
+                IPhaseHandler handler = PhaseHandlerFactory.getHandler(p);
+                if (handler != null) {
+                    phaseTextList.add(handler.getPhaseLabel());
+                }
+            }
+        }
+        return phaseTextList;
+    }
+
+    public void setPhaseTextList(List<String> phaseTextList) {
+        this.phaseTextList = phaseTextList;
     }
 
     public JSONObject getConfig() {

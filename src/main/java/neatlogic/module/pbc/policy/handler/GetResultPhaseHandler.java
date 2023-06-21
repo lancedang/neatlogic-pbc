@@ -16,12 +16,11 @@
 
 package neatlogic.module.pbc.policy.handler;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.pbc.dto.*;
-import neatlogic.framework.pbc.exception.LoginFailedException;
-import neatlogic.framework.pbc.exception.ReportResultLackParamException;
-import neatlogic.framework.pbc.exception.ValidateResultNotFoundException;
+import neatlogic.framework.pbc.exception.*;
 import neatlogic.framework.pbc.policy.core.PhaseHandlerBase;
 import neatlogic.framework.util.HttpRequestUtil;
 import neatlogic.module.pbc.utils.ConfigManager;
@@ -31,9 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class GetResultPhaseHandler extends PhaseHandlerBase {
@@ -56,19 +54,17 @@ public class GetResultPhaseHandler extends PhaseHandlerBase {
         return configList;
     }
 
-    private static final Map<String, String> codeMap = new HashMap<>();
+   /* private static final Map<String, String> codeMap = new HashMap<>();
 
     static {
-        codeMap.put("WL-10005", "已保存");
-        codeMap.put("WL-10006", "处理中");
-        codeMap.put("WL-10007", "处理失败");
-        codeMap.put("WL-10008", "部分数据异常");
-        codeMap.put("WL-10009", "处理成功");
-        codeMap.put("WL-10011", "上报数据不能为空");
-        codeMap.put("WL-10012", "上报数据中缺少branchId字段");
-        codeMap.put("WL-10013", "上报数据中缺少facilityOwnerAgency字段");
-        codeMap.put("WL-10014", "上报数据中缺少data字段");
-    }
+        codeMap.put("WL-40000", "等待逻辑检核开始");
+        codeMap.put("WL-40001", "等待入库申请");
+        codeMap.put("WL-40002", "入库处理中");
+        codeMap.put("WL-40003", "入库处理成功");
+        codeMap.put("WL-40004", "入库部分成功");
+        codeMap.put("WL-40005", "入库处理失败");
+        codeMap.put("WL-40006", "入库处理成功，但部分数据存在警告");
+    }*/
 
     /**
      * 返回数据范例
@@ -96,15 +92,10 @@ public class GetResultPhaseHandler extends PhaseHandlerBase {
     @Override
     protected String myExecute(PolicyAuditVo policyAuditVo, PolicyVo policyVo, PolicyPhaseVo policyPhaseVo, List<InterfaceVo> interfaceList) {
         PolicyPhaseVo validatePhaseVo = policyMapper.getPolicyPhaseByAuditIdAndPhase(policyAuditVo.getId(), "validate");
-        /*if (StringUtils.isBlank(policyPhaseVo.getPrevResult())) {
-            throw new ReportResultNotFoundException();
-        }*/
-        //System.out.println("执行" + policyPhaseVo.getExecCount() + "次");
         if (validatePhaseVo == null || StringUtils.isBlank(validatePhaseVo.getResult())) {
             throw new ValidateResultNotFoundException();
         }
         JSONObject jsonObj = JSONObject.parseObject(validatePhaseVo.getResult());
-        //JSONObject jsonObj = JSONObject.parseObject(policyPhaseVo.getPrevResult());
         if (StringUtils.isBlank(jsonObj.getString("groupId"))) {
             throw new ReportResultLackParamException("groupId");
         }
@@ -113,33 +104,68 @@ public class GetResultPhaseHandler extends PhaseHandlerBase {
 
         data.put("facilityOwnerAgency", ConfigManager.getConfig(policyVo.getCorporationId()).getFacilityOwnerAgency());
         data.put("groupId", groupId);
-        //System.out.println("=======获取数据核验结果数据=======");
-        //System.out.println(data.toJSONString());
-        String result = sendData(policyVo.getCorporationId(), data);
-        JSONObject resultObj = JSONObject.parseObject(result);
-        if (resultObj.getString("code").equals("WL-10009")) {
-            List<Long> deleteInterfaceIdList = interfaceItemMapper.getNeedDeleteInterfaceItemIdByAuditId(policyAuditVo.getId());
-            if (CollectionUtils.isNotEmpty(deleteInterfaceIdList)) {
-                for (Long id : deleteInterfaceIdList) {
-                    interfaceItemMapper.deleteInterfaceItemById(id);
+        String result = sendData(ConfigManager.getConfig(policyVo.getCorporationId()).getValidResultUrl(), policyVo.getCorporationId(), data);
+        JSONObject returnObj = JSONObject.parseObject(result);
+        if (returnObj != null && returnObj.containsKey("code")) {
+            String code = returnObj.getString("code");
+            if ("WL-40002".equalsIgnoreCase(code)) {
+                //处理中
+                throw new PhaseNotCompletedException(returnObj);
+            } else if ("WL-40005".equalsIgnoreCase(code) || "WL-40006".equalsIgnoreCase(code)) {
+                //处理成功
+                List<Long> deleteInterfaceIdList = interfaceItemMapper.getNeedDeleteInterfaceItemIdByAuditId(policyAuditVo.getId());
+                if (CollectionUtils.isNotEmpty(deleteInterfaceIdList)) {
+                    for (Long id : deleteInterfaceIdList) {
+                        interfaceItemMapper.deleteInterfaceItemById(id);
+                    }
                 }
+                interfaceItemMapper.updateInterfaceItemDataHashByAuditId(policyAuditVo.getId());
+                policyMapper.updatePolicyLastExecDate(policyAuditVo.getPolicyId());
+            } else if ("WL-40004".equalsIgnoreCase(code)) {
+                //部分处理失败  需更新各自item的状态
+                JSONArray dataList = returnObj.getJSONArray("data");
+                if (CollectionUtils.isNotEmpty(dataList)) {
+                    List<InterfaceItemVo> interfaceItemList = new ArrayList<>();
+                    List<InterfaceVo> interfaceAndItemList = interfaceItemMapper.getInterfaceItemByAuditId(policyAuditVo.getId());
+                    for (InterfaceVo interfaceVo : interfaceAndItemList) {
+                        List<InterfaceItemVo> itemList = interfaceVo.getInterfaceItemList();
+                        interfaceItemList.addAll(itemList);
+                    }
+                    for (int i = 0; i < dataList.size(); i++) {
+                        JSONObject dataObj = dataList.getJSONObject(i);
+                        if ("WL-10008".equalsIgnoreCase(dataObj.getString("code"))) {
+                            String branchId = dataObj.getString("branchId");
+                            JSONObject requestBranchData = new JSONObject();
+                            requestBranchData.put("facilityOwnerAgency", ConfigManager.getConfig(policyVo.getCorporationId()).getFacilityOwnerAgency());
+                            requestBranchData.put("branchId", branchId);
+                            String branchDataStr = sendData(ConfigManager.getConfig(policyVo.getCorporationId()).getSelectDataUrl(), policyVo.getCorporationId(), requestBranchData);
+                            JSONObject branchData = JSONObject.parseObject(branchDataStr);
+                            JSONArray branchDataList = branchData.getJSONArray("data");
+                            if (CollectionUtils.isNotEmpty(branchDataList)) {
+                                for (int j = 0; j < branchDataList.size(); j++) {
+                                    JSONObject branchDataObj = branchDataList.getJSONObject(j);
+                                    interfaceItemList.removeIf(d -> Objects.equals(d.getData().getString("facilityCategory"), branchDataObj.getString("facilityCategory"))
+                                            && Objects.equals(d.getData().getString("facilityDescriptor"), branchDataObj.getString("facilityDescriptor")));
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {//其他处理异常
+                throw new PhaseException(returnObj);
             }
-            //更新policy的last_action_date字段
-            policyMapper.updatePolicyLastExecDate(policyAuditVo.getPolicyId());
         }
-        //if (policyPhaseVo.getExecCount() <= 2) {
-        //throw new ApiRuntimeException("故意抛出的异常");
-        //}
+
         return result;
     }
 
-    private String sendData(Long corporationId, JSONObject reportData) {
+
+    private String sendData(String url, Long corporationId, JSONObject reportData) {
         String token = TokenUtil.getToken(corporationId);
         if (StringUtils.isBlank(token)) {
             throw new LoginFailedException();
         }
-        HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(ConfigManager.getConfig(corporationId).getValidResultUrl())
-                //.setTenant(TenantContext.get().getTenantUuid())
+        HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(url)
                 .addHeader("X-Access-Token", token)
                 .setPayload(reportData.toJSONString())
                 .sendRequest();

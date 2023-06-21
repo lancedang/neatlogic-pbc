@@ -34,8 +34,8 @@ import java.util.*;
 
 @Service
 public class SelectUploadDataPhaseHandler extends PhaseHandlerBase {
-    private static final Map<String, String> codeMap = new HashMap<>();
-
+    //private static final Map<String, String> codeMap = new HashMap<>();
+/*
     static {
         codeMap.put("WL-10005", "已保存");
         codeMap.put("WL-10006", "处理中");
@@ -46,7 +46,7 @@ public class SelectUploadDataPhaseHandler extends PhaseHandlerBase {
         codeMap.put("WL-10012", "上报数据中缺少branchId字段");
         codeMap.put("WL-10013", "上报数据中缺少facilityOwnerAgency字段");
         codeMap.put("WL-10014", "上报数据中缺少data字段");
-    }
+    }*/
 
     @Override
     public String getPhase() {
@@ -84,16 +84,23 @@ public class SelectUploadDataPhaseHandler extends PhaseHandlerBase {
         String resultStr = sendData(policyVo.getCorporationId(), data);
         JSONObject returnObj = JSONObject.parseObject(resultStr);
         if (returnObj != null && returnObj.containsKey("code")) {
-            String msg = returnObj.getString("msg");
             String code = returnObj.getString("code");
-            if ("WL-10009".equalsIgnoreCase(code) || "WL-10013".equalsIgnoreCase(code)) {//处理成功 || 处理成功但部分数据存在警告
+            if ("WL-10006".equalsIgnoreCase(code)) {
+                //处理中
+                throw new PhaseNotCompletedException(returnObj);
+            } else if ("WL-10009".equalsIgnoreCase(code) || "WL-10013".equalsIgnoreCase(code)) {
+                //处理成功
+                List<Long> deleteInterfaceIdList = interfaceItemMapper.getNeedDeleteInterfaceItemIdByAuditId(policyAuditVo.getId());
+                if (CollectionUtils.isNotEmpty(deleteInterfaceIdList)) {
+                    for (Long id : deleteInterfaceIdList) {
+                        interfaceItemMapper.deleteInterfaceItemById(id);
+                    }
+                }
                 interfaceItemMapper.updateInterfaceItemDataHashByAuditId(policyAuditVo.getId());
-            } else if ("WL-10007".equalsIgnoreCase(code)) {//处理失败
-                throw new PhaseException(returnObj);
-            } else if ("WL-10008".equalsIgnoreCase(code)) {//部分处理失败  需更新各自item的状态
+            } else if ("WL-10008".equalsIgnoreCase(code)) {
+                //部分处理失败  需更新各自item的状态
                 JSONArray dataList = returnObj.getJSONArray("data");
                 if (CollectionUtils.isNotEmpty(dataList)) {
-                    List<InterfaceItemVo> errorItemList = new ArrayList<>();
                     List<InterfaceItemVo> interfaceItemList = new ArrayList<>();
                     List<InterfaceVo> interfaceAndItemList = interfaceItemMapper.getInterfaceItemByAuditId(policyAuditVo.getId());
                     for (InterfaceVo interfaceVo : interfaceAndItemList) {
@@ -115,11 +122,10 @@ public class SelectUploadDataPhaseHandler extends PhaseHandlerBase {
                     }
                     throw new PhaseException(returnObj);
                 }
-            } else {//处理中 异常
-                throw new PhaseNotCompletedException(returnObj);
+            } else {//其他处理异常
+                throw new PhaseException(returnObj);
             }
         }
-
         return resultStr;
     }
 
@@ -134,7 +140,8 @@ public class SelectUploadDataPhaseHandler extends PhaseHandlerBase {
                 //.setAuthType(AuthenticateType.BASIC)
                 //.setUsername("neatlogic")
                 //.setPassword("x15wDEzSbBL6tV1W")
-                .setPayload(reportData.toJSONString()).sendRequest();
+                .setPayload(reportData.toJSONString())
+                .sendRequest();
         if (StringUtils.isNotBlank(httpRequestUtil.getError())) {
             throw new ApiRuntimeException(httpRequestUtil.getError());
         } else {
