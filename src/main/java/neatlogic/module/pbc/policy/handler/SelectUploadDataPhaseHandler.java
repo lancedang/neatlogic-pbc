@@ -46,6 +46,13 @@ public class SelectUploadDataPhaseHandler extends PhaseHandlerBase {
         codeMap.put("WL-10012", "上报数据中缺少branchId字段");
         codeMap.put("WL-10013", "上报数据中缺少facilityOwnerAgency字段");
         codeMap.put("WL-10014", "上报数据中缺少data字段");
+
+        //单条数据数据处理状态
+WL-20000 数据检核通过
+WL-20001 数据检核未通过
+WL-20002 数据处理失败，保存上报header记录异常
+WL-20003 数据检核通过但存在警告-新增加
+
     }*/
 
     @Override
@@ -109,8 +116,9 @@ public class SelectUploadDataPhaseHandler extends PhaseHandlerBase {
                     }
                     for (int i = 0; i < dataList.size(); i++) {
                         JSONObject dataObj = dataList.getJSONObject(i);
-                        interfaceItemList.removeIf(d -> Objects.equals(d.getData().getString("facilityCategory"), dataObj.getString("facilityCategory"))
-                                && Objects.equals(d.getData().getString("facilityDescriptor"), dataObj.getString("facilityDescriptor")));
+                        if (dataObj.getString("code").equalsIgnoreCase("WL-20001") || dataObj.getString("code").equalsIgnoreCase("WL-20002"))
+                            interfaceItemList.removeIf(d -> dataObj.getString("facilityCategory").equalsIgnoreCase(d.getData().getString("facilityCategory"))
+                                    && dataObj.getString("facilityDescriptor").equalsIgnoreCase(d.getData().getString("facilityDescriptor")));
                     }
                     //剩余的代表处理成功
                     for (InterfaceItemVo itemVo : interfaceItemList) {
